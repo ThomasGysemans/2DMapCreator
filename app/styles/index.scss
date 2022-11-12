@@ -123,7 +123,7 @@
 }
 
 .container-charter button[type="submit"] {
-  margin-top: 25px;
+  margin: 25px 0;
   font-size: 0.85em;
 }
 
@@ -141,7 +141,7 @@ main {
   align-items: center;
 }
 
-form label {
+main > form label {
   margin-bottom: 30px;
 }
 
@@ -256,12 +256,35 @@ form label {
 */
 
 .grid-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content 50px;
+  grid-template-rows: auto auto;
   height: auto;
 }
 
 .grid-sidebar {
-  width: 50px;
+  width: 100%;
   height: 100%;
   background-color: red;
+}
+
+.grid-dimensions-settings {
+  margin-top: 10px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid-dimensions-settings input {
+  width: 100px;
+  height: 45px;
+  margin-left: 5px;
+}
+
+.grid-dimensions-settings button {
+  width: 44px;
+  height: 44px;
 }

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useState } from "react";
 
-type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number|null, registerState?:(grid:Grid)=>Grid)=>void];
+type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number|null, registerState?:(grid:Grid)=>Grid)=>void, (width:number, height:number)=>void];
 
 const init = (w: number, h: number, c: number | null) => {
   let grid: Grid = [];
@@ -17,9 +17,6 @@ const init = (w: number, h: number, c: number | null) => {
 const useGrid = (width: number, height: number, initialColor: number|null): useGridHook => {
   const [grid, setGrid] = useState<Grid>(() => init(width, height, initialColor));
   const drawPixel = useCallback((pos: Pos, color: number | null, registerState?: (grid: Grid) => Grid) => {
-    console.group("drawPixel cas called");
-    console.log("color is " + color);
-    console.groupEnd();
     setGrid(v => {
       v[pos.y][pos.x] = color;
       // C/C++/Rust > JavaScript. We want a deep copy, not a shallow copy.
@@ -27,8 +24,24 @@ const useGrid = (width: number, height: number, initialColor: number|null): useG
       return registerState?.(v) ?? JSON.parse(JSON.stringify(v));
     });
   }, []);
+  const setDimensions = useCallback((w:number, h:number) => {
+    setGrid((v) => {
+      let newGrid: Grid = [];
+      for (let y = 0; y < h; y++) {
+        newGrid[y] = [];
+        for (let x = 0; x < w; x++) {
+          let currentElement: number | null = null;
+          if (v[y] !== undefined && v[y][x] !== undefined) {
+            currentElement = v[y][x];
+          }
+          newGrid[y][x] = currentElement;
+        }
+      }
+      return newGrid;
+    });
+  }, []);
 
-  return [grid, setGrid, drawPixel];
+  return [grid, setGrid, drawPixel, setDimensions];
 };
 
 export default useGrid;

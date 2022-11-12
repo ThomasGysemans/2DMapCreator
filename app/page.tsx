@@ -8,41 +8,40 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import ProjectsBar from "./components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleUser, faFileImport, faRedo, faSwatchbook, faTerminal, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDownload, faFileImport, faRedo, faSwatchbook, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "./components/Grid";
 import useGrid from "./hooks/useGrid";
 import CharterItem from "./components/CharterItem";
+import downloadCSV from "./utils/downloadCSV";
+import hexToRgb from "./utils/hexToRGB";
+
+const validateDimensions = (width:number, height:number) => {
+  if (width <= 2 || width > 100) {
+    return "La largeur n'est pas valide. Minimum: 2 et maximum: 1000.";
+  } else if (height <= 2 || height > 100) {
+    return "La hauteur n'est pas valide. Minimum: 2 et maximum: 1000.";
+  }
+  return null;
+}
 
 const Page: NextPage = () => {
   const createGridForm = useRef<HTMLFormElement>(null);
   const charterForm = useRef<HTMLFormElement>(null);
-  const [gridName, setGridName] = useState<string>("Grille actuelle");
-  /* use theses lines on production
-  const [gridWidth, setGridWidth] = useState<number>(1); // invalid values for width and height, it's normal
-  const [gridHeight, setGridHeight] = useState<number>(1);
-  */
-  const [gridWidth, setGridWidth] = useState<number>(25);
-  const [gridHeight, setGridHeight] = useState<number>(25);
+  const dimensionsForm = useRef<HTMLFormElement>(null);
+  const [gridName, setGridName] = useState<string|null>("Grille actuelle"); // to change to null in production
   const [formError, setFormError] = useState<string>("");
 
-  // Undo/redo system
+  // TODO: Undo/redo system
   // it won't work as expected because grid is also getting modified when index is in the past
   // the solution is to bring `undo` and `redo` in `useGrid`
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
-  const [grid, setGrid, drawPixel] = useGrid(25, 25, null);
+  const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, null);
   const [charter, setCharter] = useState<string[]>(["#ffffff"]);
   const [color, setColor] = useState<string>("#ffffff");
   const [isCharterOpen, setIsCharterOpen] = useState<boolean>(false);
-  const onPixelClicked = useCallback((pos: Pos) => {
-    console.group("inside onPixelClicked");
-    console.log("color = ", color);
-    console.log("charter = ", charter);
-    console.log("index in charter : ", charter.findIndex(charterColor => color === charterColor));
-    console.groupEnd();
-    drawPixel(pos, charter.findIndex(charterColor => color === charterColor))
-  }, [drawPixel, charter, color]);
+  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, charter.findIndex(charterColor => color === charterColor)), [drawPixel, charter, color]);
   const pickColor = useCallback((colorIndex: number) => setColor(charter[colorIndex]), [charter]);
   const toggleCharterContainer = useCallback(() => setIsCharterOpen(v => !v), []);
   const addNewColorToCharter = useCallback(() => setCharter(v => [...v, "#ffffff"]), []);
@@ -58,12 +57,9 @@ const Page: NextPage = () => {
     }
     let csv = "d0,d1"; // metadata
     for (let i = 0; i < numColumns; i++) csv += ",a" + i;
+    csv += "\n";
     ANSIGrid.forEach((row) => csv += "0,0," + row.join(',') + "\n");
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-    a.target = '_blank';
-    a.download = gridName + '.csv';
-    a.click();  
+    downloadCSV(gridName!, csv);
   }, [grid, gridName]);
 
   const createGrid = useCallback((e:FormEvent<HTMLFormElement>) => {
@@ -77,21 +73,18 @@ const Page: NextPage = () => {
       return setFormError("Le nom de la grille n'est pas correcte.");
     }
     const width = parseInt(data.get("width") as string, 10);
-    if (width <= 2 || width > 100) {
-      return setFormError("La largeur n'est pas valide. Minimum: 2 et maximum: 1000.");
-    }
     const height = parseInt(data.get("height") as string, 10);
-    if (height <= 2 || height > 100) {
-      return setFormError("La hauteur n'est pas valide. Minimum: 2 et maximum: 1000.");
+    const validation = validateDimensions(width, height);
+    if (validation != null) {
+      return setFormError(validation);
     }
     setFormError("");
     setGridName(name);
-    setGridWidth(width);
-    setGridHeight(height);
-  }, []);
+    setDimensions(width, height);
+  }, [setDimensions]);
 
-  const onCharterChanged = useCallback((e:FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const saveCharter = useCallback((e?:FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     const data = Array.from(new FormData(charterForm.current!).entries());
     setCharter(() => {
       const newCharter: string[] = [];
@@ -101,6 +94,29 @@ const Page: NextPage = () => {
       return newCharter;
     });
   }, []);
+
+  const downloadCharter = useCallback(() => {
+    saveCharter();
+    let csv = "index,r,g,b\n";
+    for (let i = 0; i < charter.length; i++) {
+      csv += i + ",";
+      csv += hexToRgb(charter[i]).join(',') + "\n";
+    }
+    downloadCSV("0-colors", csv);
+  }, [saveCharter, charter]);
+
+  const onDimensionsChanged = useCallback((e:FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const data = new FormData(dimensionsForm.current!);
+    const width = parseInt(data.get("width") as string, 10);
+    const height = parseInt(data.get("height") as string, 10);
+    const validation = validateDimensions(width, height);
+    if (validation != null) {
+      return; // TODO: we ignore the error message for now
+    }
+    setFormError("");
+    setDimensions(width, height);
+  }, [setDimensions]);
 
   return <div className="page">
     <aside className="toolsbar">
@@ -114,12 +130,12 @@ const Page: NextPage = () => {
         <FontAwesomeIcon icon={faSwatchbook} />
       </button>
       <button title="Exporter au format CSV" onClick={exportToCSV}>
-        <FontAwesomeIcon icon={faTerminal} />
+        <FontAwesomeIcon icon={faDownload} />
       </button>
     </aside>
     <aside className={"container-charter" + (isCharterOpen ? " open" : "")}>
       <h2>Votre charte de couleurs</h2>
-      <form ref={charterForm} onSubmit={onCharterChanged}>
+      <form ref={charterForm} onSubmit={saveCharter}>
         {charter.map((color, i) =>
           <CharterItem
             key={i + "-" + color}
@@ -130,10 +146,11 @@ const Page: NextPage = () => {
         )}
         <Button secondary onClick={addNewColorToCharter}>Ajouter une couleur</Button>
         <Button type="submit">Enregistrer les modifications</Button>
+        <Button onClick={downloadCharter}>Télécharger la charte</Button>
       </form>
     </aside>
     <main>
-      {gridWidth == 0
+      {gridName === null
         ?
         <form ref={createGridForm} onSubmit={createGrid}>
           <Input className="label-new-name" type="text" label="Nom de la nouvelle grille" name="name" required maxLength={35} />
@@ -155,6 +172,11 @@ const Page: NextPage = () => {
               Redo
             </button>
           </div>
+          <form ref={dimensionsForm} onSubmit={onDimensionsChanged} className="grid-dimensions-settings">
+            <Input label="Largeur" type="number" name="width" />
+            <Input label="Hauteur" type="number" name="height" />
+            <Button type="submit"><FontAwesomeIcon icon={faArrowsToDot} /></Button>
+          </form>
         </div>
       }
     </main>

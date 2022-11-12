@@ -15,19 +15,17 @@
 .pxm-pixel {
   margin: 0;
   padding: 0;
-  width: 20px;
-  height: 20px;
+  min-width: 15px;
+  min-height: 15px;
+  width: auto;
+  height: auto;
   box-sizing: border-box;
   cursor: pointer;
   user-select: none;
-  background-color: #cbcfd0;
+  background-color: #e2e6e7;
 }
 
 .pxm-line:nth-child(odd) .pxm-pixel:nth-child(odd),
 .pxm-line:nth-child(even) .pxm-pixel:nth-child(even) {
   background-color: #fff;
-}
-
-.pxm-pixel:last-child {
-  border-right: none;
 }
