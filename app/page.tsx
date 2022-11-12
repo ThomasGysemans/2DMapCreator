@@ -1,22 +1,22 @@
 "use client";
 
-import "./styles/index.scss";
+import "../styles/index.scss";
 
 import type { NextPage } from "next";
 import type { ChangeEvent, FormEvent } from "react";
-import Input from "./components/Input";
-import Button from "./components/Button";
-import ProjectsBar from "./components/ProjectsBar";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faFileImport, faPenFancy, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
-import { Grid } from "./components/Grid";
-import useGrid from "./hooks/useGrid";
-import ChartItem from "./components/ChartItem";
-import downloadCSV from "./utils/downloadCSV";
-import hexToRgb from "./utils/hexToRGB";
-import readCSVContent from "./utils/readCSVContent";
-import EditingTool from "./components/EditingTool";
+import { Grid } from "../components/Grid";
+import useGrid from "../hooks/useGrid";
+import ChartItem from "../components/ChartItem";
+import downloadCSV from "../utils/downloadCSV";
+import hexToRgb from "../utils/hexToRGB";
+import readCSVContent from "../utils/readCSVContent";
+import EditingTool from "../components/EditingTool";
 
 const validateDimensions = (width:number, height:number) => {
   if (width <= 2 || width > 100) {
