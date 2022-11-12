@@ -1,0 +1,33 @@
+.pxm {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.readonly-grid .pxm-pixel {
+  cursor: default;
+}
+
+.pxm-line {
+  display: flex;
+}
+
+.pxm-pixel {
+  margin: 0;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  background-color: #cbcfd0;
+}
+
+.pxm-line:nth-child(odd) .pxm-pixel:nth-child(odd),
+.pxm-line:nth-child(even) .pxm-pixel:nth-child(even) {
+  background-color: #fff;
+}
+
+.pxm-pixel:last-child {
+  border-right: none;
+}

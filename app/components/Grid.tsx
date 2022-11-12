@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 interface GridProps {
   grid:Grid;
+  charter:string[];
   uid:string;
   onPixelClicked: (pos:Pos) => void;
 }
@@ -24,13 +25,13 @@ export const Pixel: React.FC<PixelProps> = ({color, x, y, onPixelClicked}) => {
   return <div
     className="pxm-pixel"
     onClick={() => onPixelClicked({x, y})}
-    style={{ backgroundColor: color ? '#' + color : undefined }}
+    style={{ backgroundColor: color ? (!color.startsWith('#') ? '#' : '') + color : undefined }}
     data-posx={x}
     data-posy={y}
   />
 };
 
-export const Grid: React.FC<GridProps> = ({grid, uid, onPixelClicked}) => {
+export const Grid: React.FC<GridProps> = ({grid, charter, uid, onPixelClicked}) => {
   useEffect(() => {
     let mouseHold = false;
     let heldTimeout: NodeJS.Timeout;
@@ -50,6 +51,8 @@ export const Grid: React.FC<GridProps> = ({grid, uid, onPixelClicked}) => {
       }
     };
 
+    // Huge performance issue here
+    // As it can rebuild the whole grid 91000 times after 30 seconds of moving
     const onMouseMove = (e: MouseEvent) => {
       if (mouseHold) {
         const target = e.target as HTMLElement;
@@ -100,7 +103,7 @@ export const Grid: React.FC<GridProps> = ({grid, uid, onPixelClicked}) => {
           <Pixel
             onPixelClicked={onPixelClicked}
             key={"pixel-" + y + "-" + x}
-            color={cell}
+            color={cell == null ? null : charter[cell]}
             x={x}
             y={y}
           />

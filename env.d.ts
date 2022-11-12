@@ -1,6 +1,6 @@
 declare module 'sweetalert2/dist/sweetalert2';
 
-type Grid = (string | null)[][];
+type Grid = (number | null)[][];
 
 interface Pos {
   x: number;

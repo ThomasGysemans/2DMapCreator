@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useState } from "react";
 
-type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:string|null, registerState?:(grid:Grid)=>Grid)=>void];
+type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number|null, registerState?:(grid:Grid)=>Grid)=>void];
 
-const init = (w: number, h: number, c: string | null) => {
+const init = (w: number, h: number, c: number | null) => {
   let grid: Grid = [];
   for (let y = 0; y < h; y++) {
     grid[y] = [];
@@ -14,11 +14,13 @@ const init = (w: number, h: number, c: string | null) => {
   return grid;
 };
 
-const useGrid = (width: number, height: number, initialColor: string|null): useGridHook => {
+const useGrid = (width: number, height: number, initialColor: number|null): useGridHook => {
   const [grid, setGrid] = useState<Grid>(() => init(width, height, initialColor));
-  const drawPixel = useCallback((pos: Pos, color: string | null, registerState?: (grid: Grid) => Grid) => {
+  const drawPixel = useCallback((pos: Pos, color: number | null, registerState?: (grid: Grid) => Grid) => {
+    console.group("drawPixel cas called");
+    console.log("color is " + color);
+    console.groupEnd();
     setGrid(v => {
-      if (color?.startsWith('#')) color = color.substring(1);
       v[pos.y][pos.x] = color;
       // C/C++/Rust > JavaScript. We want a deep copy, not a shallow copy.
       // The problem is that the modified pixel will be displayed only after a fast refresh

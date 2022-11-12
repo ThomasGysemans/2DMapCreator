@@ -12,7 +12,6 @@ import { faCircleUser, faFileImport, faRedo, faSwatchbook, faTerminal, faUndo } 
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "./components/Grid";
 import useGrid from "./hooks/useGrid";
-import hexToANSI from "./utils/hexToANSI";
 import CharterItem from "./components/CharterItem";
 
 const Page: NextPage = () => {
@@ -34,20 +33,27 @@ const Page: NextPage = () => {
 
   const [grid, setGrid, drawPixel] = useGrid(25, 25, null);
   const [charter, setCharter] = useState<string[]>(["#ffffff"]);
-  const [color, setColor] = useState<string>("#0000ff");
+  const [color, setColor] = useState<string>("#ffffff");
   const [isCharterOpen, setIsCharterOpen] = useState<boolean>(false);
-  const onPixelClicked = useCallback((pos:Pos) => drawPixel(pos, color), [drawPixel, color]);
-  const pickColor = useCallback((color:string) => setColor(color), []);
+  const onPixelClicked = useCallback((pos: Pos) => {
+    console.group("inside onPixelClicked");
+    console.log("color = ", color);
+    console.log("charter = ", charter);
+    console.log("index in charter : ", charter.findIndex(charterColor => color === charterColor));
+    console.groupEnd();
+    drawPixel(pos, charter.findIndex(charterColor => color === charterColor))
+  }, [drawPixel, charter, color]);
+  const pickColor = useCallback((colorIndex: number) => setColor(charter[colorIndex]), [charter]);
   const toggleCharterContainer = useCallback(() => setIsCharterOpen(v => !v), []);
   const addNewColorToCharter = useCallback(() => setCharter(v => [...v, "#ffffff"]), []);
 
   const exportToCSV = useCallback(() => {
-    const ANSIGrid: string[][] = [];
+    const ANSIGrid: number[][] = [];
     const numColumns = grid[0].length;
     for (let y = 0; y < grid.length; y++) {
       ANSIGrid[y] = [];
-      for (let x = 0; x < grid[y].length; x++) {
-        ANSIGrid[y][x] = hexToANSI(grid[y][x] ?? 'ffffff', false);
+      for (let x = 0; x < numColumns; x++) {
+        ANSIGrid[y][x] = grid[y][x] ?? 0;
       }
     }
     let csv = "d0,d1"; // metadata
@@ -138,7 +144,7 @@ const Page: NextPage = () => {
         </form>
         :
         <div className="grid-container">
-          <Grid uid="unique-id" grid={grid} onPixelClicked={onPixelClicked} />
+          <Grid uid="unique-id" grid={grid} charter={charter} onPixelClicked={onPixelClicked} />
           <div className="grid-sidebar">
             <button>
               <FontAwesomeIcon icon={faUndo} />

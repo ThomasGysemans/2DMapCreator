@@ -1,5 +1,5 @@
 import "./styles/globals.scss";
-import "./lib/pixelmaker-styles.css";
+import "./styles/grid.scss";
 
 // FontAwesome
 import { config } from '@fortawesome/fontawesome-svg-core'

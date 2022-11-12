@@ -94,6 +94,10 @@
   padding: 0 5px 0 10px;
   width: 80px;
   height: 40px;
+
+  &.unvalid-color {
+    border-color: red;
+  }
 }
 
 .charter-item input[type="color"] {
