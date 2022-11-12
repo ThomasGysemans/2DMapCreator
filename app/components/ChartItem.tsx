@@ -17,7 +17,7 @@ const isValidColorFormat = (color:string) => {
   return /^#[a-f\d]{6}$/i.test(color);
 };
 
-const CharterItem: React.FC<Props> = ({n, color, onPick}) => {
+const ChartItem: React.FC<Props> = ({n, color, onPick}) => {
   const [isValidColor, setIsValidColor] = useState<boolean>(true);
   const [selectedColor, setSelectedColor] = useState<string>(color);
   const onColorPicked = useCallback(() => onPick(n), [n, onPick]);
@@ -27,7 +27,7 @@ const CharterItem: React.FC<Props> = ({n, color, onPick}) => {
     setSelectedColor(input.target.value)
   }, []);
 
-  return <div className="charter-item">
+  return <div className="chart-item">
     <span>{n} - </span>
     <input className={!isValidColor ? 'unvalid-color' : ''} type="text" name={"name-" + n} value={selectedColor} onChange={handleSelectedColor} />
     <input type="color" value={(isValidColor ? selectedColor : "#000000")} onChange={handleSelectedColor} />
@@ -35,4 +35,4 @@ const CharterItem: React.FC<Props> = ({n, color, onPick}) => {
   </div>;
 };
 
-export default CharterItem;
+export default ChartItem;

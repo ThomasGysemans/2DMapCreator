@@ -3,7 +3,7 @@
 import "./styles/index.scss";
 
 import type { NextPage } from "next";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import Input from "./components/Input";
 import Button from "./components/Button";
 import ProjectsBar from "./components/ProjectsBar";
@@ -12,9 +12,10 @@ import { faArrowsToDot, faCircleUser, faDownload, faFileImport, faRedo, faSwatch
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "./components/Grid";
 import useGrid from "./hooks/useGrid";
-import CharterItem from "./components/CharterItem";
+import ChartItem from "./components/ChartItem";
 import downloadCSV from "./utils/downloadCSV";
 import hexToRgb from "./utils/hexToRGB";
+import readCSVContent from "./utils/readCSVContent";
 
 const validateDimensions = (width:number, height:number) => {
   if (width <= 2 || width > 100) {
@@ -27,8 +28,9 @@ const validateDimensions = (width:number, height:number) => {
 
 const Page: NextPage = () => {
   const createGridForm = useRef<HTMLFormElement>(null);
-  const charterForm = useRef<HTMLFormElement>(null);
+  const chartForm = useRef<HTMLFormElement>(null);
   const dimensionsForm = useRef<HTMLFormElement>(null);
+  const importCSVInput = useRef<HTMLInputElement>(null);
   const [gridName, setGridName] = useState<string|null>("Grille actuelle"); // to change to null in production
   const [formError, setFormError] = useState<string>("");
 
@@ -38,13 +40,34 @@ const Page: NextPage = () => {
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, null);
-  const [charter, setCharter] = useState<string[]>(["#ffffff"]);
+  const [chart, setChart] = useState<string[]>(["#ffffff"]);
   const [color, setColor] = useState<string>("#ffffff");
-  const [isCharterOpen, setIsCharterOpen] = useState<boolean>(false);
-  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, charter.findIndex(charterColor => color === charterColor)), [drawPixel, charter, color]);
-  const pickColor = useCallback((colorIndex: number) => setColor(charter[colorIndex]), [charter]);
-  const toggleCharterContainer = useCallback(() => setIsCharterOpen(v => !v), []);
-  const addNewColorToCharter = useCallback(() => setCharter(v => [...v, "#ffffff"]), []);
+  const [isChartOpen, setIsChartOpen] = useState<boolean>(false);
+  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, chart.findIndex(chartColor => color === chartColor)), [drawPixel, chart, color]);
+  const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex]), [chart]);
+  const toggleChartContainer = useCallback(() => setIsChartOpen(v => !v), []);
+  const addNewColorToChart = useCallback(() => setChart(v => [...v, "#ffffff"]), []);
+
+  const uploadFile = useCallback(() => importCSVInput.current!.click(), []);
+  const handleImportedFile = useCallback((e:ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = e.target.files?.[0] ?? null;
+    if (uploadedFile) {
+      const reader = new FileReader();
+      reader.addEventListener('load', (event) => {
+        const content = event.target!.result;
+        if (typeof content !== "string") {
+          throw new Error("Expected plain text as content for imported file.");
+        }
+        const result = readCSVContent(content);
+        if (result.type === "map") {
+          setGrid(result.result as Grid);
+        } else {
+          setChart(result.result as string[]);
+        }
+      });
+      reader.readAsText(uploadedFile);
+    }
+  }, [setGrid]);
 
   const exportToCSV = useCallback(() => {
     const ANSIGrid: number[][] = [];
@@ -83,27 +106,27 @@ const Page: NextPage = () => {
     setDimensions(width, height);
   }, [setDimensions]);
 
-  const saveCharter = useCallback((e?:FormEvent<HTMLFormElement>) => {
+  const saveChart = useCallback((e?:FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
-    const data = Array.from(new FormData(charterForm.current!).entries());
-    setCharter(() => {
-      const newCharter: string[] = [];
+    const data = Array.from(new FormData(chartForm.current!).entries());
+    setChart(() => {
+      const newChart: string[] = [];
       for (let i = 0; i < data.length; i++) {
-        newCharter[i] = data[i][1].toString();
+        newChart[i] = data[i][1].toString();
       }
-      return newCharter;
+      return newChart;
     });
   }, []);
 
-  const downloadCharter = useCallback(() => {
-    saveCharter();
+  const downloadChart = useCallback(() => {
+    saveChart();
     let csv = "index,r,g,b\n";
-    for (let i = 0; i < charter.length; i++) {
+    for (let i = 0; i < chart.length; i++) {
       csv += i + ",";
-      csv += hexToRgb(charter[i]).join(',') + "\n";
+      csv += hexToRgb(chart[i]).join(',') + "\n";
     }
     downloadCSV("0-colors", csv);
-  }, [saveCharter, charter]);
+  }, [saveChart, chart]);
 
   const onDimensionsChanged = useCallback((e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,30 +146,31 @@ const Page: NextPage = () => {
       <button title="Se connecter">
         <FontAwesomeIcon icon={faCircleUser} />
       </button>
-      <button title="Importer un fichier CSV">
+      <button className="import-button" title="Importer un fichier CSV" onClick={uploadFile}>
+        <input ref={importCSVInput} type="file" accept="text/csv, .csv" onChange={handleImportedFile} />
         <FontAwesomeIcon icon={faFileImport} />
       </button>
-      <button title="Ouvrir la charte de couleurs" onClick={toggleCharterContainer}>
+      <button title="Ouvrir la charte de couleurs" onClick={toggleChartContainer}>
         <FontAwesomeIcon icon={faSwatchbook} />
       </button>
       <button title="Exporter au format CSV" onClick={exportToCSV}>
         <FontAwesomeIcon icon={faDownload} />
       </button>
     </aside>
-    <aside className={"container-charter" + (isCharterOpen ? " open" : "")}>
+    <aside className={"container-chart" + (isChartOpen ? " open" : "")}>
       <h2>Votre charte de couleurs</h2>
-      <form ref={charterForm} onSubmit={saveCharter}>
-        {charter.map((color, i) =>
-          <CharterItem
+      <form ref={chartForm} onSubmit={saveChart}>
+        {chart.map((color, i) =>
+          <ChartItem
             key={i + "-" + color}
             n={i}
             color={color}
             onPick={pickColor}
           />
         )}
-        <Button secondary onClick={addNewColorToCharter}>Ajouter une couleur</Button>
+        <Button secondary onClick={addNewColorToChart}>Ajouter une couleur</Button>
         <Button type="submit">Enregistrer les modifications</Button>
-        <Button onClick={downloadCharter}>Télécharger la charte</Button>
+        <Button onClick={downloadChart}>Télécharger la charte</Button>
       </form>
     </aside>
     <main>
@@ -161,7 +185,7 @@ const Page: NextPage = () => {
         </form>
         :
         <div className="grid-container">
-          <Grid uid="unique-id" grid={grid} charter={charter} onPixelClicked={onPixelClicked} />
+          <Grid uid="unique-id" grid={grid} chart={chart} onPixelClicked={onPixelClicked} />
           <div className="grid-sidebar">
             <button>
               <FontAwesomeIcon icon={faUndo} />

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 interface GridProps {
   grid:Grid;
-  charter:string[];
+  chart:string[];
   uid:string;
   onPixelClicked: (pos:Pos) => void;
 }
@@ -31,7 +31,7 @@ export const Pixel: React.FC<PixelProps> = ({color, x, y, onPixelClicked}) => {
   />
 };
 
-export const Grid: React.FC<GridProps> = ({grid, charter, uid, onPixelClicked}) => {
+export const Grid: React.FC<GridProps> = ({grid, chart, uid, onPixelClicked}) => {
   useEffect(() => {
     let mouseHold = false;
     let heldTimeout: NodeJS.Timeout;
@@ -103,7 +103,7 @@ export const Grid: React.FC<GridProps> = ({grid, charter, uid, onPixelClicked}) 
           <Pixel
             onPixelClicked={onPixelClicked}
             key={"pixel-" + y + "-" + x}
-            color={cell == null ? null : charter[cell]}
+            color={cell == null ? null : chart[cell]}
             x={x}
             y={y}
           />

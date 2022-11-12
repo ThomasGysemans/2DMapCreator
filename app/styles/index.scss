@@ -39,25 +39,38 @@
   }
 }
 
+.import-button {
+  position: relative;
+
+  input {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    visibility: hidden;
+    width: 10px;
+    height: 10px;
+  }
+}
+
 /*
 *
-* Charter
+* Chart
 *
 */
 
-.container-charter,
-.container-charter > form {
+.container-chart,
+.container-chart > form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.container-charter {
+.container-chart {
   position: absolute;
   z-index: 10;
   top: 0;
   left: $tools-bar-width;
-  width: $charter-width;
+  width: $chart-width;
   height: 100vh;
   padding: 40px 30px;
   box-sizing: border-box;
@@ -75,14 +88,14 @@
   }
 }
 
-.charter-item {
+.chart-item {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 50px;
 }
 
-.charter-item span {
+.chart-item span {
   display: block;
   width: 30px;
   min-width: 30px;
@@ -90,7 +103,7 @@
   font-size: 0.9em;
 }
 
-.charter-item input[type="text"] {
+.chart-item input[type="text"] {
   padding: 0 5px 0 10px;
   width: 80px;
   height: 40px;
@@ -100,7 +113,7 @@
   }
 }
 
-.charter-item input[type="color"] {
+.chart-item input[type="color"] {
   width: 45px;
   height: 45px;
   min-width: 45px;
@@ -115,14 +128,14 @@
   }
 }
 
-.charter-item button {
+.chart-item button {
   width: 40px;
   height: 40px;
   min-width: 40px;
   min-height: 40px;
 }
 
-.container-charter button[type="submit"] {
+.container-chart button[type="submit"] {
   margin: 25px 0;
   font-size: 0.85em;
 }
@@ -187,7 +200,7 @@ main > form label {
 }
 
 .projects-bar > h2,
-.container-charter > h2 {
+.container-chart > h2 {
   text-align: center;
   border-bottom: 1px solid $project-label-text-color;
   font-size: 1.4em;
