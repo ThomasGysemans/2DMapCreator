@@ -8,7 +8,7 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import ProjectsBar from "./components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDownload, faFileImport, faRedo, faSwatchbook, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faFileImport, faPenFancy, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "./components/Grid";
 import useGrid from "./hooks/useGrid";
@@ -16,6 +16,7 @@ import ChartItem from "./components/ChartItem";
 import downloadCSV from "./utils/downloadCSV";
 import hexToRgb from "./utils/hexToRGB";
 import readCSVContent from "./utils/readCSVContent";
+import EditingTool from "./components/EditingTool";
 
 const validateDimensions = (width:number, height:number) => {
   if (width <= 2 || width > 100) {
@@ -33,6 +34,8 @@ const Page: NextPage = () => {
   const importCSVInput = useRef<HTMLInputElement>(null);
   const [gridName, setGridName] = useState<string|null>("Grille actuelle"); // to change to null in production
   const [formError, setFormError] = useState<string>("");
+  const [editingMod, setEditingMod] = useState<EditingMod>("default");
+  const changeEditingTool = useCallback((newEditingTool:EditingMod) => setEditingMod(newEditingTool), []);
 
   // TODO: Undo/redo system
   // it won't work as expected because grid is also getting modified when index is in the past
@@ -43,7 +46,7 @@ const Page: NextPage = () => {
   const [chart, setChart] = useState<string[]>(["#ffffff"]);
   const [color, setColor] = useState<string>("#ffffff");
   const [isChartOpen, setIsChartOpen] = useState<boolean>(false);
-  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, chart.findIndex(chartColor => color === chartColor)), [drawPixel, chart, color]);
+  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, chart.findIndex(chartColor => color === chartColor), editingMod), [drawPixel, editingMod, chart, color]);
   const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex]), [chart]);
   const toggleChartContainer = useCallback(() => setIsChartOpen(v => !v), []);
   const addNewColorToChart = useCallback(() => setChart(v => [...v, "#ffffff"]), []);
@@ -137,9 +140,10 @@ const Page: NextPage = () => {
     if (validation != null) {
       return; // TODO: we ignore the error message for now
     }
-    setFormError("");
     setDimensions(width, height);
   }, [setDimensions]);
+
+  // TODO: the buttons inside the chart container are still focusable even though the container is hidden
 
   return <div className="page">
     <aside className="toolsbar">
@@ -187,14 +191,9 @@ const Page: NextPage = () => {
         <div className="grid-container">
           <Grid uid="unique-id" grid={grid} chart={chart} onPixelClicked={onPixelClicked} />
           <div className="grid-sidebar">
-            <button>
-              <FontAwesomeIcon icon={faUndo} />
-              Undo
-            </button>
-            <button>
-              <FontAwesomeIcon icon={faRedo} />
-              Redo
-            </button>
+            <EditingTool icon={faPenFancy} mode="default" enabled={editingMod === "default"} onClick={changeEditingTool} />
+            <EditingTool icon={faSquare} mode="square" enabled={editingMod === "square"} onClick={changeEditingTool} />
+            <EditingTool icon={faDiamond} mode="circle" enabled={editingMod === "circle"} onClick={changeEditingTool} />
           </div>
           <form ref={dimensionsForm} onSubmit={onDimensionsChanged} className="grid-dimensions-settings">
             <Input label="Largeur" type="number" name="width" />

@@ -278,7 +278,33 @@ main > form label {
 .grid-sidebar {
   width: 100%;
   height: 100%;
-  background-color: red;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $projects-bar-background-color;
+}
+
+.grid-sidebar button {
+  background-color: #fff;
+  border: 1px solid darken($projects-bar-background-color, 20%);
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  transition: background-color 200ms ease;
+
+  &:hover,
+  &:focus,
+  &.enabled {
+    background-color: darken($projects-bar-background-color, 5%);
+  }
+
+  &:focus {
+    outline: 1px solid $outline-color;
+  }
 }
 
 .grid-dimensions-settings {
