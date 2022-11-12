@@ -1,0 +1,24 @@
+@import "var.scss";
+
+label {
+  display: block;
+  color: $text-color;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+input {
+  font-family: $font-family;
+  background-color: $input-background-color;
+  color: $text-color;
+  border: $input-border;
+  border-radius: 5px;
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  padding: 0 5px 0 10px;
+
+  &:focus {
+    outline: 1px solid $outline-color;
+  }
+}

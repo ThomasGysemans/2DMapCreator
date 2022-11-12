@@ -1,0 +1,37 @@
+@import "./var.scss";
+
+.button-primary,
+.button-secondary {
+  width: 200px;
+  height: 45px;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: $font-family;
+  border-radius: 5px;
+
+  &:focus {
+    outline: 2px solid $outline-color;
+  }
+} 
+
+.button-primary {
+  border: none;
+  background-color: $primary-color;
+  color: $over-primary-text-color;
+  transition: background-color 200ms ease;
+
+  &:hover {
+    background-color: darken($primary-color, 20%);
+  }
+}
+
+.button-secondary {
+  border: 1px solid $primary-color;
+  color: $primary-color;
+  background-color: transparent;
+  transition: background-color 200ms ease;
+
+  &:hover {
+    background-color: rgba($primary-color, .1);
+  }
+}
