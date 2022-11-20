@@ -20,6 +20,7 @@ type GridData = string[];
 interface UserData {
   projects:ProjectData[];
   registrationDate:number;
+  chart: Chart;
 }
 
 // We cannot store multidimensional arrays in Firestore
@@ -31,7 +32,6 @@ interface ProjectData {
   lastModifiedDate:number;
   creationDate:number;
   grid:GridData; // each line is a string
-  chart:Chart;
 }
 
 interface CompiledProjectData extends ProjectData {

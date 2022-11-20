@@ -101,9 +101,9 @@ const Page: NextPage = () => {
           if (projects.length > 0) {
             const firstProject = projects[0];
             setGrid(firstProject.grid);
-            setChart(firstProject.chart);
             setAllProjects(projects);
           }
+          setChart(data.chart);
         }
       }
     })();
@@ -167,17 +167,14 @@ const Page: NextPage = () => {
     setAskingToCreateANewGrid(false);
     setAllProjects(p => {
       const newGrid = initGrid(width, height, null);
-      const newChart = ["#ffffff"];
       p.push({
         name,
-        chart: newChart,
         grid: newGrid,
         creationDate: new Date().getTime(),
         lastModifiedDate: new Date().getTime()
       });
       setSelectedProjectIndex(p.length-1);
       setGrid(newGrid);
-      setChart(newChart);
       return deepCopyOf(p);
     });
   }, [setGrid]);
@@ -266,11 +263,10 @@ const Page: NextPage = () => {
       updatedProjects[selectedProjectIndex] = {
         ...updatedProjects[selectedProjectIndex],
         grid,
-        chart,
         lastModifiedDate: new Date().getTime(),
       };
-      const savedProjects = updatedProjects.map(p => saveProject(p.name, p.chart, p.grid, p.creationDate));
-      await updateDoc(docRef, {projects: savedProjects});
+      const savedProjects = updatedProjects.map(p => saveProject(p.name, p.grid, p.creationDate));
+      await updateDoc(docRef, {chart, projects: savedProjects});
       setAllProjects((all) => {
         all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
         return deepCopyOf(all);
@@ -288,9 +284,7 @@ const Page: NextPage = () => {
       await save();
     }
     setGrid(allProjects[index].grid);
-    setChart(allProjects[index].chart);
     setGridName(allProjects[index].name);
-    console.log("selected grid is ", allProjects[index].grid);
     setSelectedProjectIndex(index);
     setAskingToCreateANewGrid(false);
   };
@@ -384,6 +378,7 @@ const Page: NextPage = () => {
     <ProjectsBar
       selectedProjectIndex={selectedProjectIndex}
       projects={allProjects}
+      chart={chart}
       onProjectSelected={onProjectSelected}
       onCreateGrid={createNewGrid}
     />

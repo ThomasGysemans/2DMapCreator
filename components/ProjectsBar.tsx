@@ -5,6 +5,7 @@ import GridView from "./GridView";
 
 interface ProjectsBarProps {
   projects:CompiledProjectData[];
+  chart:Chart;
   selectedProjectIndex?:number;
   onProjectSelected:(index:number)=>void;
   onCreateGrid:()=>void;
@@ -12,11 +13,12 @@ interface ProjectsBarProps {
 
 interface ProjectProps {
   project: CompiledProjectData;
+  chart:Chart;
   onSelect?: (index:number)=>void;
   index?: number;
 }
 
-const ProjectsBar: React.FC<ProjectsBarProps> = ({projects, onProjectSelected, onCreateGrid, selectedProjectIndex=0}) => {
+const ProjectsBar: React.FC<ProjectsBarProps> = ({projects, chart, onProjectSelected, onCreateGrid, selectedProjectIndex=0}) => {
   const [minimizedProjectsBar, setMinimizedProjectsBar] = useState(false);
   const minimizeProjectsBar = useCallback(() => setMinimizedProjectsBar(v => !v), []);
 
@@ -31,7 +33,7 @@ const ProjectsBar: React.FC<ProjectsBarProps> = ({projects, onProjectSelected, o
     <h2>Vos projets</h2>
     {
       projects.length > selectedProjectIndex
-        ? <ProjectComponent onSelect={onProjectSelected} index={selectedProjectIndex} project={projects[selectedProjectIndex]} />
+        ? <ProjectComponent onSelect={onProjectSelected} index={selectedProjectIndex} project={projects[selectedProjectIndex]} chart={chart} />
         : null
     }
     <button className="add-project" onClick={onCreateGrid}>
@@ -41,16 +43,16 @@ const ProjectsBar: React.FC<ProjectsBarProps> = ({projects, onProjectSelected, o
       if (i == selectedProjectIndex) {
         return null;
       }
-      return <ProjectComponent onSelect={onProjectSelected} index={i} key={p.name} project={p} />
+      return <ProjectComponent onSelect={onProjectSelected} index={i} key={p.name} project={p} chart={chart} />
     })}
   </aside>
 };
 
-const ProjectComponent: React.FC<ProjectProps> = ({project,index,onSelect}) => {
+const ProjectComponent: React.FC<ProjectProps> = ({project,chart,index,onSelect}) => {
   const onClick = useCallback(() => onSelect?.(index!), [index, onSelect]);
   return <div className="project" onClick={onClick}>
     <span>{project.name}</span>
-    <GridView uid={project.name} grid={project.grid} chart={project.chart}  />
+    <GridView uid={project.name} grid={project.grid} chart={chart}  />
   </div>
 };
 

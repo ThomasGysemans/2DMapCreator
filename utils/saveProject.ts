@@ -17,10 +17,9 @@ function saveGrid(grid: Grid): GridData {
 /**
  * Given project's data, we need to format it an a way that Firestore handles.
  */
-export default function saveProject(name:string, chart:Chart, grid:Grid, creationDate:number):ProjectData {
+export default function saveProject(name:string, grid:Grid, creationDate:number):ProjectData {
   return {
     name,
-    chart,
     grid: saveGrid(grid),
     creationDate,
     lastModifiedDate: new Date().getTime()
