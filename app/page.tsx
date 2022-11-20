@@ -2,7 +2,6 @@
 
 import "../styles/index.scss";
 
-import type { NextPage } from "next";
 import { ChangeEvent, FormEvent, useEffect } from "react";
 import Input from "../components/Input";
 import Button from "../components/Button";
@@ -36,7 +35,7 @@ const validateDimensions = (width:number, height:number) => {
   return null;
 }
 
-const Page: NextPage = () => {
+const Page = () => {
   const authState = useAuth();
 
   const [allProjects, setAllProjects] = useState<CompiledProjectData[]>([]);
