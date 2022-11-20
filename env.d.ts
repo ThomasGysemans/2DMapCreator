@@ -15,7 +15,11 @@ interface AuthContextValue {
   user: import("firebase/auth").User | null;
 }
 
-type GridData = string[];
+// We cannot store multidimensional arrays in Firestore
+// Therefore, to represent a grid, which is a 2d array,
+// each line will be a string, and the grid an array of H strings,
+// where H is the height of the grid
+type GridData = string[];  // each line is a string
 
 interface UserData {
   projects:ProjectData[];
@@ -23,15 +27,11 @@ interface UserData {
   chart: Chart;
 }
 
-// We cannot store multidimensional arrays in Firestore
-// Therefore, to represent a grid, which is a 2d array,
-// each line will be a string, and the grid an array of H strings,
-// where H is the height of the grid
 interface ProjectData {
   name:string;
   lastModifiedDate:number;
   creationDate:number;
-  grid:GridData; // each line is a string
+  grid:GridData;
 }
 
 interface CompiledProjectData extends ProjectData {

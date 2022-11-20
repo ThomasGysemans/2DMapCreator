@@ -216,15 +216,20 @@ main > form label {
 // TODO: overflow-y:auto doesn't work as it hides the button to minimize the bar due to fixed position
 
 .projects-bar {
-  background-color: $projects-bar-background-color;
-  width: $projects-bar-maximum-size;
   height: 100vh;
   position: fixed;
   top: 0;
   right: 0;
-  box-sizing: border-box;
-  padding: 40px 50px;
   transition: transform 200ms ease;
+}
+
+.projects-bar aside {
+  background-color: $projects-bar-background-color;
+  width: $projects-bar-maximum-size;
+  height: inherit;
+  padding: 40px 50px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .projects-bar.minimized {
@@ -307,6 +312,13 @@ main > form label {
 .project,
 .add-project {
   margin-bottom: 20px;
+}
+
+.disabled-project,
+.loading-project {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 /*
