@@ -1,21 +1,11 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useState } from "react";
+import initGrid from "../utils/initGrid";
 
 type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number|null, tool:EditingMod)=>void, (width:number, height:number)=>void];
 
-const init = (w: number, h: number, c: number | null) => {
-  let grid: Grid = [];
-  for (let y = 0; y < h; y++) {
-    grid[y] = [];
-    for (let x = 0; x < w; x++) {
-      grid[y][x] = c;
-    }
-  }
-  return grid;
-};
-
 const useGrid = (width: number, height: number, initialColor: number|null): useGridHook => {
-  const [grid, setGrid] = useState<Grid>(() => init(width, height, initialColor));
+  const [grid, setGrid] = useState<Grid>(() => initGrid(width, height, initialColor));
   const drawPixel = useCallback((pos: Pos, color: number | null, tool:EditingMod) => {
     setGrid(v => {
       const maxY = v.length - 1;

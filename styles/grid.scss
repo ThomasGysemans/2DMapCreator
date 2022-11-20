@@ -1,24 +1,32 @@
+@import "var.scss";
+
 .pxm {
   display: flex;
   flex-direction: column;
   position: relative;
+  border: 1px solid $project-label-text-color;
+  box-sizing: border-box;
+  background-color: #e2e6e7;
 }
 
-.readonly-grid .pxm-pixel {
-  cursor: default;
+.pxm-readonly-grid .pxm-pixel {
+  cursor: inherit;
 }
 
 .pxm-line {
   display: flex;
 }
 
+.pxm-pixel:last-child {
+  box-sizing: border-box;
+}
+
 .pxm-pixel {
   margin: 0;
   padding: 0;
-  min-width: 15px;
-  min-height: 15px;
-  width: auto;
-  height: auto;
+  width: 15px;
+  height: 15px;
+  aspect-ratio: 1;
   box-sizing: border-box;
   cursor: pointer;
   user-select: none;

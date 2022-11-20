@@ -1,17 +1,25 @@
-import type React from "react";
 import type { MouseEventHandler } from "react";
 
 interface Props {
+  loading?:boolean;
   secondary?:boolean;
   type?:"submit"|"button";
   children: React.ReactNode;
   onClick?:MouseEventHandler<HTMLButtonElement>;
 }
 
-const Input: React.FC<Props> = ({ secondary=false, type="button", children, onClick }) => {
+const Button: React.FC<Props> = ({ loading=false, secondary=false, type="button", children, onClick }) => {
   return <button type={type} onClick={onClick} className={secondary ? "button-secondary" : "button-primary"}>
-    {children}
+    {loading ? <LoadingAnimation /> : children}
   </button>
 };
 
-export default Input;
+const LoadingAnimation: React.FC = () => {
+  return <div className="buttonLoadingAnimation">
+    <span>.</span>
+    <span>.</span>
+    <span>.</span>
+  </div>
+};
+
+export default Button;

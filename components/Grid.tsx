@@ -1,4 +1,3 @@
-import type React from "react";
 import { useEffect } from "react";
 
 interface GridProps {
@@ -6,13 +5,7 @@ interface GridProps {
   chart:string[];
   uid:string;
   onPixelClicked: (pos:Pos) => void;
-}
-
-interface PixelProps {
-  onPixelClicked: (pos: Pos) => void;
-  x: number;
-  y: number;
-  color:string|null; // hexadecimal format
+  pxSize?:number;
 }
 
 interface PixelData {
@@ -21,17 +14,26 @@ interface PixelData {
   uid: string;
 }
 
-export const Pixel: React.FC<PixelProps> = ({color, x, y, onPixelClicked}) => {
+interface PixelProps {
+  onPixelClicked: (pos: Pos) => void;
+  x: number;
+  y: number;
+  color: string | null; // hexadecimal format
+  pxSize?:number;
+}
+
+const Pixel: React.FC<PixelProps> = ({ color, x, y, pxSize, onPixelClicked }) => {
+  const wh = pxSize !== undefined ? { width: pxSize + "px", height: pxSize + "px" } : {};
   return <div
     className="pxm-pixel"
-    onClick={() => onPixelClicked({x, y})}
-    style={{ backgroundColor: color ? (!color.startsWith('#') ? '#' : '') + color : undefined }}
+    onClick={() => onPixelClicked({ x, y })}
+    style={{ backgroundColor: color ? (!color.startsWith('#') ? '#' : '') + color : undefined, ...wh }}
     data-posx={x}
     data-posy={y}
   />
 };
 
-export const Grid: React.FC<GridProps> = ({grid, chart, uid, onPixelClicked}) => {
+export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClicked}) => {
   useEffect(() => {
     let mouseHold = false;
     let heldTimeout: NodeJS.Timeout;
@@ -106,6 +108,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, onPixelClicked}) =>
             color={cell == null ? null : chart[cell]}
             x={x}
             y={y}
+            pxSize={pxSize}
           />
         )}
       </div>

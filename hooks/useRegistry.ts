@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import deepCopyOf from "../utils/deepCopyOf";
 
 type useRegistryHook = [
   (grid:Grid) => Grid,
@@ -8,8 +9,6 @@ type useRegistryHook = [
     canRedo: () => boolean,
   }
 ];
-
-const deepCopyOf = (val:any) => JSON.parse(JSON.stringify(val));
 
 const useRegistry = (initialGrid: Grid, applier: (grid:Grid) => void): useRegistryHook => {
   const [states, setStates] = useState<Grid[]>([deepCopyOf(initialGrid)]);

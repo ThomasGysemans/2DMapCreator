@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import type { ChangeEvent } from "react";
 import { useCallback, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"

@@ -1,9 +1,7 @@
-import type React from "react";
-
 interface Props {
   label:string;
   name:string;
-  type:"text"|"number";
+  type:"text"|"number"|"email"|"password";
   className?:string;
   maxLength?:number;
   required?:boolean;

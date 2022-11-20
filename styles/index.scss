@@ -54,18 +54,14 @@
 
 /*
 *
-* Chart
+* Left sidebar, the
+* the sidebar we can open on the left
+* giving the account container
+* or the chart container
 *
 */
 
-.container-chart,
-.container-chart > form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.container-chart {
+.left-sidebar {
   position: absolute;
   z-index: 10;
   top: 0;
@@ -86,6 +82,40 @@
     pointer-events: all;
     transform: translateX(0%);
   }
+}
+
+/*
+*
+* Account
+*
+*/
+
+.login-form p {
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.login-form input,
+.login-form button {
+  width: 100%;
+  height: 50px;
+}
+
+.login-form input {
+  margin-bottom: 25px;
+}
+
+/*
+*
+* Chart
+*
+*/
+
+.container-chart,
+.container-chart > form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .chart-item {
@@ -183,6 +213,8 @@ main > form label {
 *
 */ 
 
+// TODO: overflow-y:auto doesn't work as it hides the button to minimize the bar due to fixed position
+
 .projects-bar {
   background-color: $projects-bar-background-color;
   width: $projects-bar-maximum-size;
@@ -200,7 +232,7 @@ main > form label {
 }
 
 .projects-bar > h2,
-.container-chart > h2 {
+.left-sidebar > h2 {
   text-align: center;
   border-bottom: 1px solid $project-label-text-color;
   font-size: 1.4em;
@@ -262,6 +294,21 @@ main > form label {
   }
 }
 
+.project {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 200ms ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.project,
+.add-project {
+  margin-bottom: 20px;
+}
+
 /*
 *
 * Grid
@@ -270,9 +317,8 @@ main > form label {
 
 .grid-container {
   display: grid;
-  grid-template-columns: max-content 50px;
+  grid-template-columns: 1fr 50px;
   grid-template-rows: auto auto;
-  height: auto;
 }
 
 .grid-sidebar {
@@ -326,4 +372,13 @@ main > form label {
 .grid-dimensions-settings button {
   width: 44px;
   height: 44px;
+}
+
+.projects-bar .project .pxm-line {
+  width: 100%;
+}
+
+.projects-bar .project .pxm-pixel {
+  width: 100%;
+  height: 100%;
 }
