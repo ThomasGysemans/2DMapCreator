@@ -27,10 +27,11 @@ import deepCopyOf from "../utils/deepCopyOf";
 import saveProject from "../utils/saveProject";
 
 const validateDimensions = (width:number, height:number) => {
-  if (width <= 2 || width > 100) {
-    return "La largeur n'est pas valide. Minimum: 2 et maximum: 1000.";
-  } else if (height <= 2 || height > 100) {
-    return "La hauteur n'est pas valide. Minimum: 2 et maximum: 1000.";
+  const max = 150;
+  if (width <= 2 || width > max) {
+    return `La largeur n'est pas valide. Minimum: 2 et maximum: ${max}.`;
+  } else if (height <= 2 || height > max) {
+    return `La hauteur n'est pas valide. Minimum: 2 et maximum: ${max}.`;
   }
   return null;
 }
