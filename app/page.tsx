@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faEraser, faFileImport, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faEraser, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "../components/Grid";
 import { useAuth } from "../fireconfig/auth";
@@ -360,9 +360,10 @@ const Page = () => {
           <div className="grid-sidebar">
             <EditingTool icon={faPenFancy} mode="default" enabled={editingMod === "default"} onClick={changeEditingTool} />
             <EditingTool icon={faSquare} mode="square" enabled={editingMod === "square"} onClick={changeEditingTool} />
-            <EditingTool icon={faDiamond} mode="circle" enabled={editingMod === "circle"} onClick={changeEditingTool} />
             <EditingTool icon={faEraser} mode="eraser" enabled={editingMod === "eraser"} onClick={changeEditingTool} />
+            <EditingTool icon={faDiamond} mode="circle" enabled={editingMod === "circle"} onClick={changeEditingTool} />
             <EditingTool icon={faRightLong} mode="line" enabled={editingMod === "line"} onClick={changeEditingTool} />
+            <EditingTool icon={faFill} mode="fill" enabled={editingMod === "fill"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
             <button onClick={save}><FontAwesomeIcon icon={faSave} /></button>

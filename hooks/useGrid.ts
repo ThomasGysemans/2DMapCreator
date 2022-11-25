@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 import { useState } from "react";
+import fillGridWith from "../utils/fillGridWith";
 import initGrid from "../utils/initGrid";
 
 type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number, tool:EditingMod)=>void, (width:number, height:number)=>void];
@@ -10,7 +11,6 @@ const useGrid = (width: number, height: number, initialColor: number): useGridHo
     setGrid(v => {
       const maxY = v.length - 1;
       const maxX = v[0].length - 1;
-      console.log("tool is", tool);
       switch (tool) {
         // with tool "eraser" it will already have color set to -1 so the default case handles it
         case "square":
@@ -44,6 +44,10 @@ const useGrid = (width: number, height: number, initialColor: number): useGridHo
             v[pos.y][px] = color;
             px++;
           }
+          break;
+        case "fill":
+          fillGridWith(v, pos.y, pos.x, color);
+          break;
         default:
           v[pos.y][pos.x] = color;
       }
