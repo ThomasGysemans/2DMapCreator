@@ -10,6 +10,7 @@ const useGrid = (width: number, height: number, initialColor: number): useGridHo
     setGrid(v => {
       const maxY = v.length - 1;
       const maxX = v[0].length - 1;
+      console.log("tool is", tool);
       switch (tool) {
         // with tool "eraser" it will already have color set to -1 so the default case handles it
         case "square":
@@ -37,6 +38,12 @@ const useGrid = (width: number, height: number, initialColor: number): useGridHo
             v[pos.y + 2][pos.x] = color;
           }
           break;
+        case "line":
+          let px = pos.x;
+          while (v[pos.y][px] !== color && px <= maxX) {
+            v[pos.y][px] = color;
+            px++;
+          }
         default:
           v[pos.y][pos.x] = color;
       }
