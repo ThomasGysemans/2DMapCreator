@@ -2,15 +2,16 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 import { useState } from "react";
 import initGrid from "../utils/initGrid";
 
-type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number|null, tool:EditingMod)=>void, (width:number, height:number)=>void];
+type useGridHook = [Grid, Dispatch<SetStateAction<Grid>>, (pos:Pos, color:number, tool:EditingMod)=>void, (width:number, height:number)=>void];
 
-const useGrid = (width: number, height: number, initialColor: number|null): useGridHook => {
+const useGrid = (width: number, height: number, initialColor: number): useGridHook => {
   const [grid, setGrid] = useState<Grid>(() => initGrid(width, height, initialColor));
-  const drawPixel = useCallback((pos: Pos, color: number | null, tool:EditingMod) => {
+  const drawPixel = useCallback((pos: Pos, color: number, tool:EditingMod) => {
     setGrid(v => {
       const maxY = v.length - 1;
       const maxX = v[0].length - 1;
       switch (tool) {
+        // with tool "eraser" it will already have color set to -1 so the default case handles it
         case "square":
           v[pos.y][pos.x] = color;
           if (pos.y + 1 <= maxY && pos.x + 1 <= maxX) {
@@ -50,7 +51,7 @@ const useGrid = (width: number, height: number, initialColor: number|null): useG
       for (let y = 0; y < h; y++) {
         newGrid[y] = [];
         for (let x = 0; x < w; x++) {
-          let currentElement: number | null = null;
+          let currentElement = -1;
           if (v[y] !== undefined && v[y][x] !== undefined) {
             currentElement = v[y][x];
           }

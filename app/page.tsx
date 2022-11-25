@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faFileImport, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faEraser, faFileImport, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "../components/Grid";
 import { useAuth } from "../fireconfig/auth";
@@ -78,10 +78,10 @@ const Page = () => {
   // the solution is to bring `undo` and `redo` in `useGrid`
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
-  const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, null);
+  const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
   const [chart, setChart] = useState<Chart>(["#ffffff"]);
   const [color, setColor] = useState<string>("#ffffff");
-  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, chart.findIndex(chartColor => color === chartColor), editingMod), [drawPixel, editingMod, chart, color]);
+  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor), editingMod), [drawPixel, editingMod, chart, color]);
   const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex]), [chart]);
   const addNewColorToChart = useCallback(() => setChart(v => [...v, "#ffffff"]), []);
 
@@ -166,7 +166,7 @@ const Page = () => {
     setGridName(name);
     setAskingToCreateANewGrid(false);
     setAllProjects(p => {
-      const newGrid = initGrid(width, height, null);
+      const newGrid = initGrid(width, height, -1);
       p.push({
         name,
         grid: newGrid,
@@ -363,6 +363,7 @@ const Page = () => {
             <EditingTool icon={faPenFancy} mode="default" enabled={editingMod === "default"} onClick={changeEditingTool} />
             <EditingTool icon={faSquare} mode="square" enabled={editingMod === "square"} onClick={changeEditingTool} />
             <EditingTool icon={faDiamond} mode="circle" enabled={editingMod === "circle"} onClick={changeEditingTool} />
+            <EditingTool icon={faEraser} mode="eraser" enabled={editingMod === "eraser"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
             <button onClick={save}><FontAwesomeIcon icon={faSave} /></button>

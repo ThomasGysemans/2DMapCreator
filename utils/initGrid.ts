@@ -5,7 +5,7 @@
  * @param c The default color index from the chart
  * @returns An grid of type Grid
  */
-export default function initGrid(w: number, h: number, c: number | null) {
+export default function initGrid(w: number, h: number, c: number) {
   let grid: Grid = [];
   for (let y = 0; y < h; y++) {
     grid[y] = [];

@@ -1,8 +1,8 @@
 declare module 'sweetalert2/dist/sweetalert2';
 
 type Tab = "account" | "chart";
-type EditingMod = "default" | "square" | "circle";
-type Grid = (number | null)[][];
+type EditingMod = "default" | "square" | "circle" | "eraser";
+type Grid = (number)[][];
 type Chart = string[];
 
 interface Pos {

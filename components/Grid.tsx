@@ -105,7 +105,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClic
           <Pixel
             onPixelClicked={onPixelClicked}
             key={"pixel-" + y + "-" + x}
-            color={cell == null ? null : chart[cell]}
+            color={cell == -1 ? null : chart[cell]}
             x={x}
             y={y}
             pxSize={pxSize}

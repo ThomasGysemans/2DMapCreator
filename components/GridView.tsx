@@ -12,6 +12,8 @@ interface PixelProps {
   y:number;
 }
 
+// color is null for transparent colors,
+// i.e when the element in the grid is -1
 const Pixel: React.FC<PixelProps> = ({color,x,y}) => {
   return <div
     className="pxm-pixel"
@@ -28,7 +30,7 @@ const GridViewComponent: React.FC<GridViewProps> = ({uid,grid,chart}) => {
         {line.map((cell, x) =>
           <Pixel
             key={"pixel-" + y + "-" + x}
-            color={cell == null ? null : chart[cell]}
+            color={cell == -1 ? null : chart[cell]}
             x={x}
             y={y}
           />
