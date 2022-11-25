@@ -25,6 +25,9 @@ import compileGridData from "../utils/compileGridData";
 import initGrid from "../utils/initGrid";
 import deepCopyOf from "../utils/deepCopyOf";
 import saveProject from "../utils/saveProject";
+import { faImage } from "@fortawesome/free-regular-svg-icons";
+import downloadPNG from "../utils/downloadPNG";
+import createPNG from "../utils/createPNG";
 
 const validateDimensions = (width:number, height:number) => {
   const max = 150;
@@ -145,6 +148,8 @@ const Page = () => {
     ANSIGrid.forEach((row) => csv += "0,0," + row.join(',') + "\n");
     downloadCSV(gridName!, csv);
   }, [grid, gridName]);
+
+  const exportToPNG = useCallback(() => downloadPNG(createPNG(grid, chart), gridName!), [grid, chart, gridName]);
 
   const initApp = useCallback((e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -296,7 +301,7 @@ const Page = () => {
 
   return <div className="page">
     <aside className="toolsbar">
-      <button title="Se connecter" onClick={selectAccountTab}>
+      <button title="Votre compte" onClick={selectAccountTab}>
         <FontAwesomeIcon icon={faCircleUser} />
       </button>
       <button className="import-button" title="Importer un fichier CSV" onClick={uploadFile}>
@@ -308,6 +313,9 @@ const Page = () => {
       </button>
       <button title="Exporter au format CSV" onClick={exportToCSV}>
         <FontAwesomeIcon icon={faDownload} />
+      </button>
+      <button title="Exporter au format PNG" onClick={exportToPNG}>
+        <FontAwesomeIcon icon={faImage} />
       </button>
     </aside>
     {selectedTab === "account"

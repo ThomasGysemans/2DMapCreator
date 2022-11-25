@@ -4,4 +4,5 @@ export default function downloadCSV(name:string,content:string) {
   a.target = '_blank';
   a.download = name + '.csv';
   a.click();
+  a.remove();
 }
