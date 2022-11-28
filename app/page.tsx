@@ -112,6 +112,20 @@ const Page = () => {
     })();
   }, [authState, setChart, setGrid]);
 
+  useEffect(() => {
+    const handleEscapeKey = (e:KeyboardEvent) => {
+      if (e.key === "Esc" || e.key === "Escape") {
+        if (isLeftSidebarOpen) {
+          setIsLeftSidebarOpen(false);
+        }
+      }
+    };
+    window.addEventListener("keyup", handleEscapeKey);
+    return () => {
+      window.removeEventListener("keyup", handleEscapeKey);
+    };
+  }, [isLeftSidebarOpen]);
+
   const uploadFile = useCallback(() => importCSVInput.current!.click(), []);
   const handleImportedFile = useCallback((e:ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0] ?? null;
@@ -301,6 +315,7 @@ const Page = () => {
 
   return <div className="page">
     <aside className="toolsbar">
+
       <button title="Votre compte" onClick={selectAccountTab}>
         <FontAwesomeIcon icon={faCircleUser} />
       </button>
