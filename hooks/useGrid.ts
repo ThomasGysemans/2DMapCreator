@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useCallback } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 import { useState } from "react";
 import fillGridWith from "../utils/fillGridWith";
 import initGrid from "../utils/initGrid";
@@ -40,9 +41,16 @@ const useGrid = (width: number, height: number, initialColor: number): useGridHo
           break;
         case "line":
           let px = pos.x;
-          while (v[pos.y][px] !== color && px <= maxX) {
+          while (px <= maxX && v[pos.y][px] !== color) {
             v[pos.y][px] = color;
             px++;
+          }
+          break;
+        case "vertical-line":
+          let py = pos.y;
+          while (py <= maxY && v[py][pos.x] !== color) {
+            v[py][pos.x] = color;
+            py++;
           }
           break;
         case "fill":

@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faEraser, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faDownLong, faEraser, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "../components/Grid";
 import { useAuth } from "../fireconfig/auth";
@@ -386,6 +386,7 @@ const Page = () => {
             <EditingTool icon={faEraser} mode="eraser" enabled={editingMod === "eraser"} onClick={changeEditingTool} />
             <EditingTool icon={faDiamond} mode="circle" enabled={editingMod === "circle"} onClick={changeEditingTool} />
             <EditingTool icon={faRightLong} mode="line" enabled={editingMod === "line"} onClick={changeEditingTool} />
+            <EditingTool icon={faDownLong} mode="vertical-line" enabled={editingMod === "vertical-line"} onClick={changeEditingTool} />
             <EditingTool icon={faFill} mode="fill" enabled={editingMod === "fill"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>

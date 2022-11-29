@@ -1,7 +1,7 @@
 declare module 'sweetalert2/dist/sweetalert2';
 
 type Tab = "account" | "chart";
-type EditingMod = "default" | "square" | "circle" | "eraser" | "line" | "fill";
+type EditingMod = "default" | "square" | "circle" | "eraser" | "line" | "vertical-line" | "fill";
 type Grid = number[][];
 type Chart = string[];
 
