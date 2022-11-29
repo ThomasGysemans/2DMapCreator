@@ -212,12 +212,13 @@ const Page = () => {
 
   const downloadChart = useCallback(() => {
     saveChart();
-    let csv = "index,r,g,b\n";
+    const lines = ["index,r,g,b"];
     for (let i = 0; i < chart.length; i++) {
-      csv += i + ",";
-      csv += hexToRgb(chart[i]).join(',') + "\n";
+      lines.push(
+        i + "," + hexToRgb(chart[i]).join(',')
+      );
     }
-    downloadCSV("0-colors", csv);
+    downloadCSV("0-colors", lines.join('\n'));
   }, [saveChart, chart]);
 
   const onDimensionsChanged = useCallback((e:FormEvent<HTMLFormElement>) => {
