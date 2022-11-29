@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Button: React.FC<Props> = ({ loading=false, secondary=false, type="button", children, onClick }) => {
-  return <button type={type} onClick={onClick} className={secondary ? "button-secondary" : "button-primary"}>
+  return <button disabled={loading} type={type} onClick={onClick} className={secondary ? "button-secondary" : "button-primary"}>
     {loading ? <LoadingAnimation /> : children}
   </button>
 };

@@ -12,7 +12,7 @@
   &:focus {
     outline: 2px solid $outline-color;
   }
-} 
+}
 
 .button-primary {
   border: none;
@@ -59,4 +59,8 @@
   to {
     opacity: 0.2;
   }
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
