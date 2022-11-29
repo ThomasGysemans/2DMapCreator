@@ -51,6 +51,10 @@
   }
 }
 
+.buttonLoadingAnimation.opposite span {
+  color: #333;
+}
+
 @keyframes loading {
   from {
     opacity: 1;
@@ -59,8 +63,4 @@
   to {
     opacity: 0.2;
   }
-}
-
-button:disabled {
-  cursor: not-allowed;
 }

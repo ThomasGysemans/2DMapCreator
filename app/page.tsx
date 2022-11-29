@@ -28,6 +28,7 @@ import saveProject from "../utils/saveProject";
 import { faImage } from "@fortawesome/free-regular-svg-icons";
 import downloadPNG from "../utils/downloadPNG";
 import createPNG from "../utils/createPNG";
+import LoadingAnimation from "../components/LoadingAnimation";
 
 const validateDimensions = (width:number, height:number) => {
   const max = 150;
@@ -198,17 +199,27 @@ const Page = () => {
     });
   }, [setGrid]);
 
-  const saveChart = useCallback((e?:FormEvent<HTMLFormElement>) => {
+  const saveChart = useCallback(async (e?:FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     const data = Array.from(new FormData(chartForm.current!).entries());
-    setChart(() => {
-      const newChart: Chart = [];
-      for (let i = 0; i < data.length; i++) {
-        newChart[i] = data[i][1].toString();
+    const newChart: Chart = [];
+    for (let i = 0; i < data.length; i++) {
+      newChart[i] = data[i][1].toString();
+    }
+    if (isLoggedIn(authState)) {
+      setLoading(true);
+      try {
+        const user = authState.user!;
+        const docRef = doc(firestore, "users", user.uid);
+        await updateDoc(docRef, { chart: newChart });
+      } catch (e) {
+        console.warn("Cannot save the chart due to error '" + (e as any).code + "'. Skipping.");
+      } finally {
+        setLoading(false);
       }
-      return newChart;
-    });
-  }, []);
+    }
+    setChart(newChart);
+  }, [authState]);
 
   const downloadChart = useCallback(() => {
     saveChart();
@@ -269,28 +280,35 @@ const Page = () => {
     try {
       await signOut(auth);
     } catch (e) {
-      console.warn("Cannot sign out the user");
+      console.warn("Cannot sign out the user due to error '" + (e as any).code + "'. Skipping.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   const save = async () => {
-    if (isLoggedIn(authState)) {
-      const user = authState.user!;
-      const docRef = doc(firestore, "users", user.uid);
-      const updatedProjects = deepCopyOf(allProjects) as CompiledProjectData[];
-      updatedProjects[selectedProjectIndex] = {
-        ...updatedProjects[selectedProjectIndex],
-        grid,
-        lastModifiedDate: new Date().getTime(),
-      };
-      const savedProjects = updatedProjects.map(p => saveProject(p.name, p.grid, p.creationDate));
-      await updateDoc(docRef, {chart, projects: savedProjects});
-      setAllProjects((all) => {
-        all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
-        return deepCopyOf(all);
-      });
+    try {
+      setLoading(true);
+      if (isLoggedIn(authState)) {
+        const user = authState.user!;
+        const docRef = doc(firestore, "users", user.uid);
+        const updatedProjects = deepCopyOf(allProjects) as CompiledProjectData[];
+        updatedProjects[selectedProjectIndex] = {
+          ...updatedProjects[selectedProjectIndex],
+          grid,
+          lastModifiedDate: new Date().getTime(),
+        };
+        const savedProjects = updatedProjects.map(p => saveProject(p.name, p.grid, p.creationDate));
+        await updateDoc(docRef, { chart, projects: savedProjects });
+        setAllProjects((all) => {
+          all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
+          return deepCopyOf(all);
+        });
+      }
+    } catch (e) {
+      console.warn("Cannot save the projects due to error '" + (e as any).code + "'. Skipping.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -363,7 +381,7 @@ const Page = () => {
             />
           )}
           <Button secondary onClick={addNewColorToChart}>Ajouter une couleur</Button>
-          <Button type="submit">Enregistrer les modifications</Button>
+          <Button type="submit" loading={loading}>Enregistrer les modifications</Button>
           <Button onClick={downloadChart}>Télécharger la charte</Button>
         </form>
       </aside>
@@ -391,7 +409,14 @@ const Page = () => {
             <EditingTool icon={faFill} mode="fill" enabled={editingMod === "fill"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
-            <button onClick={save}><FontAwesomeIcon icon={faSave} /></button>
+            {isLoggedIn(authState)
+              ? <button onClick={save} disabled={loading}>
+                  {loading
+                    ? <LoadingAnimation opposite />
+                    : <FontAwesomeIcon icon={faSave} />
+                  }
+                </button>
+              : null}
           </div>
           <form ref={dimensionsForm} onSubmit={onDimensionsChanged} className="grid-dimensions-settings">
             <Input label="Largeur" type="number" name="width" />

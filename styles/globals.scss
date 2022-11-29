@@ -7,3 +7,7 @@ body {
   margin: 0;
   font-family: $font-family;
 }
+
+button:disabled {
+  cursor: not-allowed;
+}

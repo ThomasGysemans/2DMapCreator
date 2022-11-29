@@ -1,4 +1,5 @@
 import type { MouseEventHandler } from "react";
+import LoadingAnimation from "./LoadingAnimation";
 
 interface Props {
   loading?:boolean;
@@ -12,14 +13,6 @@ const Button: React.FC<Props> = ({ loading=false, secondary=false, type="button"
   return <button disabled={loading} type={type} onClick={onClick} className={secondary ? "button-secondary" : "button-primary"}>
     {loading ? <LoadingAnimation /> : children}
   </button>
-};
-
-const LoadingAnimation: React.FC = () => {
-  return <div className="buttonLoadingAnimation">
-    <span>.</span>
-    <span>.</span>
-    <span>.</span>
-  </div>
 };
 
 export default Button;
