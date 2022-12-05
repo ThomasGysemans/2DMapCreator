@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 interface GridProps {
   grid:Grid;
-  chart:string[];
+  chart:Chart;
   uid:string;
   onPixelClicked: (pos:Pos) => void;
   pxSize?:number;
@@ -105,7 +105,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClic
           <Pixel
             onPixelClicked={onPixelClicked}
             key={"pixel-" + y + "-" + x}
-            color={cell == -1 ? null : chart[cell]}
+            color={cell == -1 ? null : chart[cell].color}
             x={x}
             y={y}
             pxSize={pxSize}

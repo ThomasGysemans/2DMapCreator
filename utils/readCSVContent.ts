@@ -2,7 +2,7 @@ import rgbToHex from "./rgbToHex";
 
 interface CSVContent {
   type: 'map' | 'chart';
-  result: Grid | string[];
+  result: Grid | Chart;
 }
 
 /**
@@ -26,14 +26,15 @@ export default function readCSVContent(fileContent:string): CSVContent {
       result: grid,
     }
   } else if (lines[0].startsWith("index")) {
-    const chart: string[] = [];
+    const chart: Chart = [];
     for (let y = 1; y < lines.length; y++) {
       const line = lines[y].split(',');
       const index = parseInt(line[0], 10);
-      const r = parseInt(line[1], 10);
-      const g = parseInt(line[2], 10);
-      const b = parseInt(line[3], 10);
-      chart[index] = "#" + rgbToHex([r,g,b]);
+      const x = parseInt(line[1], 10);
+      const r = parseInt(line[2], 10);
+      const g = parseInt(line[3], 10);
+      const b = parseInt(line[4], 10);
+      chart[index].color = "#" + rgbToHex([r,g,b]);
     }
     return {
       type: 'chart',

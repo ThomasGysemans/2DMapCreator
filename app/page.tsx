@@ -83,11 +83,11 @@ const Page = () => {
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
-  const [chart, setChart] = useState<Chart>(["#ffffff"]);
+  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true}]);
   const [color, setColor] = useState<string>("#ffffff");
-  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor), editingMod), [drawPixel, editingMod, chart, color]);
-  const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex]), [chart]);
-  const addNewColorToChart = useCallback(() => setChart(v => [...v, "#ffffff"]), []);
+  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor.color), editingMod), [drawPixel, editingMod, chart, color]);
+  const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex].color), [chart]);
+  const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true}]), []);
 
   const [pxSize, setPXSize] = useState<number>(15);
   const zoomIn = useCallback(() => setPXSize(v => v + 1), []);
@@ -201,10 +201,12 @@ const Page = () => {
 
   const saveChart = useCallback(async (e?:FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
-    const data = Array.from(new FormData(chartForm.current!).entries());
+    const chartItems = Array.from(chartForm.current!.querySelectorAll(".chart-item")) as HTMLDivElement[];
     const newChart: Chart = [];
-    for (let i = 0; i < data.length; i++) {
-      newChart[i] = data[i][1].toString();
+    for (let element of chartItems) {
+      const colorInput = element.querySelector("input[type='text']") as HTMLInputElement;
+      const xInput = element.querySelector("input[type='checkbox']") as HTMLInputElement;
+      newChart.push({color: colorInput.value, x: xInput.checked});
     }
     if (isLoggedIn(authState)) {
       setLoading(true);
@@ -223,10 +225,10 @@ const Page = () => {
 
   const downloadChart = useCallback(() => {
     saveChart();
-    const lines = ["index,r,g,b"];
+    const lines = ["index,x,r,g,b"];
     for (let i = 0; i < chart.length; i++) {
       lines.push(
-        i + "," + hexToRgb(chart[i]).join(',')
+        i + "," + (chart[i].x ? '1' : '0') + "," + hexToRgb(chart[i].color).join(',')
       );
     }
     downloadCSV("0-colors", lines.join('\n'));
