@@ -12,7 +12,7 @@ export default function createPNG(grid:Grid, chart:Chart): string {
         if (colorIndex === -1) {
           continue;
         }
-        context.fillStyle = chart[colorIndex];
+        context.fillStyle = chart[colorIndex].color;
         context.fillRect(j * pixSize, i * pixSize, pixSize, pixSize);
       }
     }
