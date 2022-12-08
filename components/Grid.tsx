@@ -4,7 +4,7 @@ interface GridProps {
   grid:Grid;
   chart:Chart;
   uid:string;
-  onPixelClicked: (pos:Pos) => void;
+  onPixelClicked: (pos:Pos, e:MouseEvent) => void;
   pxSize?:number;
 }
 
@@ -15,21 +15,23 @@ interface PixelData {
 }
 
 interface PixelProps {
-  onPixelClicked: (pos: Pos) => void;
+  onPixelClicked: (pos: Pos, e:MouseEvent) => void;
   x: number;
   y: number;
   color: string | null; // hexadecimal format
   pxSize?:number;
+  chartIndex:number;
 }
 
-const Pixel: React.FC<PixelProps> = ({ color, x, y, pxSize, onPixelClicked }) => {
+const Pixel: React.FC<PixelProps> = ({ color, x, y, pxSize, chartIndex, onPixelClicked }) => {
   const wh = pxSize !== undefined ? { width: pxSize + "px", height: pxSize + "px" } : {};
   return <div
     className="pxm-pixel"
-    onClick={() => onPixelClicked({ x, y })}
+    onClick={(e) => onPixelClicked({ x, y }, e as any)}
     style={{ backgroundColor: color ? (!color.startsWith('#') ? '#' : '') + color : undefined, ...wh }}
     data-posx={x}
     data-posy={y}
+    data-chartindex={chartIndex}
   />
 };
 
@@ -78,7 +80,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClic
                 }
               }
               if (!alreadyDrawn) {
-                onPixelClicked(pos);
+                onPixelClicked(pos, e);
                 drawnPixelsOnHold.push(pixelData);
               }
             }
@@ -106,6 +108,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClic
             onPixelClicked={onPixelClicked}
             key={"pixel-" + y + "-" + x}
             color={cell == -1 ? null : chart[cell].color}
+            chartIndex={cell}
             x={x}
             y={y}
             pxSize={pxSize}

@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faDownLong, faEraser, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faDownLong, faEraser, faEyeDropper, faEyeDropperEmpty, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "../components/Grid";
 import { useAuth } from "../fireconfig/auth";
@@ -85,13 +85,31 @@ const Page = () => {
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
   const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true}]);
   const [color, setColor] = useState<string>("#ffffff");
-  const onPixelClicked = useCallback((pos: Pos) => drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor.color), editingMod), [drawPixel, editingMod, chart, color]);
   const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex].color), [chart]);
+  const onPixelClicked = useCallback((pos: Pos, e:MouseEvent) => {
+    if (editingMod === "pick") {
+      // select the html ID instead
+      // because selecting the grid according to the pos
+      // makes the drag color feature impossible
+      // as `grid` becomes a dependency of
+      const index = (e.target as HTMLDivElement).getAttribute("data-chartindex");
+      if (index) {
+        const n = parseInt(index, 10);
+        if (n === -1) {
+          return;
+        }
+        setColor(chart[n].color);
+        setEditingMod("default");
+      }
+    } else {
+      drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor.color), editingMod)
+    }
+  }, [drawPixel, editingMod, chart, color]);
   const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true}]), []);
 
   const [pxSize, setPXSize] = useState<number>(15);
   const zoomIn = useCallback(() => setPXSize(v => v + 1), []);
-  const zoomOut = useCallback(() => setPXSize(v => v == 0 ? v : v - 1), []);
+  const zoomOut = useCallback(() => setPXSize(v => v === 0 ? v : v - 1), []);
 
   useEffect(() => {
     (async () => {
@@ -268,6 +286,7 @@ const Page = () => {
         const user = credential.user;
         const uid = user.uid;
         await setDoc(doc(firestore, "users", uid), {
+          chart: [],
           projects: [],
           registrationDate: new Date().getTime()
         });
@@ -331,6 +350,8 @@ const Page = () => {
     setSelectedProjectIndex(-1);
     setAskingToCreateANewGrid(true);
   }, []);
+
+  //const pickColorFromMap = useCallback(() => setEditingMod("pick"), []);
 
   // TODO: the buttons inside the chart container are still focusable even though the container is hidden
 
@@ -409,6 +430,7 @@ const Page = () => {
             <EditingTool icon={faRightLong} mode="line" enabled={editingMod === "line"} onClick={changeEditingTool} />
             <EditingTool icon={faDownLong} mode="vertical-line" enabled={editingMod === "vertical-line"} onClick={changeEditingTool} />
             <EditingTool icon={faFill} mode="fill" enabled={editingMod === "fill"} onClick={changeEditingTool} />
+            <EditingTool icon={faEyeDropperEmpty} mode="pick" enabled={editingMod === "pick"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
             {isLoggedIn(authState)
