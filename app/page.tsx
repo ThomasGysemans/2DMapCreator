@@ -310,22 +310,22 @@ const Page = () => {
   const save = async () => {
     try {
       setLoading(true);
+      const updatedProjects = deepCopyOf(allProjects) as CompiledProjectData[];
+      updatedProjects[selectedProjectIndex] = {
+        ...updatedProjects[selectedProjectIndex],
+        grid,
+        lastModifiedDate: new Date().getTime(),
+      };
+      const savedProjects = updatedProjects.map(p => saveProject(p.name, p.grid, p.creationDate));
       if (isLoggedIn(authState)) {
         const user = authState.user!;
         const docRef = doc(firestore, "users", user.uid);
-        const updatedProjects = deepCopyOf(allProjects) as CompiledProjectData[];
-        updatedProjects[selectedProjectIndex] = {
-          ...updatedProjects[selectedProjectIndex],
-          grid,
-          lastModifiedDate: new Date().getTime(),
-        };
-        const savedProjects = updatedProjects.map(p => saveProject(p.name, p.grid, p.creationDate));
         await updateDoc(docRef, { chart, projects: savedProjects });
-        setAllProjects((all) => {
-          all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
-          return deepCopyOf(all);
-        });
       }
+      setAllProjects((all) => {
+        all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
+        return deepCopyOf(all);
+      });
     } catch (e) {
       console.warn("Cannot save the projects due to error '" + (e as any).code + "'. Skipping.");
     } finally {
@@ -350,8 +350,6 @@ const Page = () => {
     setSelectedProjectIndex(-1);
     setAskingToCreateANewGrid(true);
   }, []);
-
-  //const pickColorFromMap = useCallback(() => setEditingMod("pick"), []);
 
   // TODO: the buttons inside the chart container are still focusable even though the container is hidden
 
@@ -433,14 +431,12 @@ const Page = () => {
             <EditingTool icon={faEyeDropperEmpty} mode="pick" enabled={editingMod === "pick"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
             <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
-            {isLoggedIn(authState)
-              ? <button onClick={save} disabled={loading}>
-                  {loading
-                    ? <LoadingAnimation opposite />
-                    : <FontAwesomeIcon icon={faSave} />
-                  }
-                </button>
-              : null}
+            <button onClick={save} disabled={loading}>
+              {loading
+                ? <LoadingAnimation opposite />
+                : <FontAwesomeIcon icon={faSave} />
+              }
+            </button>
           </div>
           <form ref={dimensionsForm} onSubmit={onDimensionsChanged} className="grid-dimensions-settings">
             <Input label="Largeur" type="number" name="width" />
