@@ -19,16 +19,17 @@ interface PixelProps {
   x: number;
   y: number;
   color: string | null; // hexadecimal format
-  pxSize?:number;
   chartIndex:number;
+  pxSize?:number;
+  hidden?:boolean;
 }
 
-const Pixel: React.FC<PixelProps> = ({ color, x, y, pxSize, chartIndex, onPixelClicked }) => {
+const Pixel: React.FC<PixelProps> = ({ color, x, y, pxSize, chartIndex, hidden, onPixelClicked }) => {
   const wh = pxSize !== undefined ? { width: pxSize + "px", height: pxSize + "px" } : {};
   return <div
     className="pxm-pixel"
     onClick={(e) => onPixelClicked({ x, y }, e as any)}
-    style={{ backgroundColor: color ? (!color.startsWith('#') ? '#' : '') + color : undefined, ...wh }}
+    style={{ backgroundColor: hidden ? undefined : (color ? (!color.startsWith('#') ? '#' : '') + color : undefined), ...wh }}
     data-posx={x}
     data-posy={y}
     data-chartindex={chartIndex}
@@ -109,6 +110,7 @@ export const Grid: React.FC<GridProps> = ({grid, chart, uid, pxSize, onPixelClic
             key={"pixel-" + y + "-" + x}
             color={cell == -1 ? null : chart[cell].color}
             chartIndex={cell}
+            hidden={cell == -1 ? false : chart[cell].hidden}
             x={x}
             y={y}
             pxSize={pxSize}

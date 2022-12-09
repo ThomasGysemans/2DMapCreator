@@ -83,9 +83,10 @@ const Page = () => {
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
-  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true}]);
-  const [color, setColor] = useState<string>("#ffffff");
-  const pickColor = useCallback((colorIndex: number) => setColor(chart[colorIndex].color), [chart]);
+  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true, hidden: false}]);
+  const [color, setColor] = useState<number>(0);
+  const pickColor = useCallback((colorIndex: number) => setColor(colorIndex), []);
+  const hideColor = useCallback((colorIndex: number) => setChart(c => c.map((value, i) => ({...value, hidden: colorIndex === i ? !value.hidden : value.hidden}))), []);
   const onPixelClicked = useCallback((pos: Pos, e:MouseEvent) => {
     if (editingMod === "pick") {
       // select the html ID instead
@@ -98,14 +99,14 @@ const Page = () => {
         if (n === -1) {
           return;
         }
-        setColor(chart[n].color);
+        setColor(n);
         setEditingMod("default");
       }
     } else {
-      drawPixel(pos, editingMod === "eraser" ? -1 : chart.findIndex(chartColor => color === chartColor.color), editingMod)
+      drawPixel(pos, editingMod === "eraser" ? -1 : color, editingMod)
     }
-  }, [drawPixel, editingMod, chart, color]);
-  const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true}]), []);
+  }, [drawPixel, editingMod, color]);
+  const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true,hidden:false}]), []);
 
   const [pxSize, setPXSize] = useState<number>(15);
   const zoomIn = useCallback(() => setPXSize(v => v + 1), []);
@@ -224,7 +225,7 @@ const Page = () => {
     for (let element of chartItems) {
       const colorInput = element.querySelector("input[type='text']") as HTMLInputElement;
       const xInput = element.querySelector("input[type='checkbox']") as HTMLInputElement;
-      newChart.push({color: colorInput.value, x: xInput.checked});
+      newChart.push({color: colorInput.value, x: xInput.checked });
     }
     if (isLoggedIn(authState)) {
       setLoading(true);
@@ -238,7 +239,7 @@ const Page = () => {
         setLoading(false);
       }
     }
-    setChart(newChart);
+    setChart(c => newChart.map((value, index) => ({...value, hidden: c[index].hidden})));
   }, [authState]);
 
   const downloadChart = useCallback(() => {
@@ -320,7 +321,7 @@ const Page = () => {
       if (isLoggedIn(authState)) {
         const user = authState.user!;
         const docRef = doc(firestore, "users", user.uid);
-        await updateDoc(docRef, { chart, projects: savedProjects });
+        await updateDoc(docRef, { chart: deepCopyOf(chart).map((v:ChartItemDesc) => { if (v.hidden !== undefined) delete v.hidden; return v; }), projects: savedProjects });
       }
       setAllProjects((all) => {
         all[selectedProjectIndex] = updatedProjects[selectedProjectIndex];
@@ -399,6 +400,7 @@ const Page = () => {
               n={i}
               color={color}
               onPick={pickColor}
+              onHide={hideColor}
             />
           )}
           <Button secondary onClick={addNewColorToChart}>Ajouter une couleur</Button>

@@ -116,6 +116,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .chart-item {
@@ -186,6 +187,12 @@
   height: 40px;
   min-width: 40px;
   min-height: 40px;
+}
+
+.chart-item .eye {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .container-chart button[type="submit"] {
@@ -259,13 +266,14 @@ main > form label {
   transform: translateX(90%);
 }
 
-.projects-bar > h2,
-.left-sidebar > h2 {
+.projects-bar h2,
+.left-sidebar h2 {
   text-align: center;
   border-bottom: 1px solid $project-label-text-color;
   font-size: 1.4em;
   margin: 0 0 30px 0;
   padding-bottom: 30px;
+  width: 100%;
 }
 
 .project span {
