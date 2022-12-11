@@ -12,7 +12,7 @@ interface CSVContent {
  */
 export default function readCSVContent(fileContent:string): CSVContent {
   const lines = fileContent.trim().split("\n");
-  if (lines[0].startsWith("d0,d1")) {
+  if (lines[0].startsWith("a0")) {
     const grid: Grid = [];
     for (let y = 1; y < lines.length; y++) {
       grid[y-1] = [];
@@ -31,10 +31,13 @@ export default function readCSVContent(fileContent:string): CSVContent {
       const line = lines[y].split(',');
       const index = parseInt(line[0], 10);
       const x = parseInt(line[1], 10);
-      const r = parseInt(line[2], 10);
-      const g = parseInt(line[3], 10);
-      const b = parseInt(line[4], 10);
+      const i = parseInt(line[2], 10);
+      const r = parseInt(line[3], 10);
+      const g = parseInt(line[4], 10);
+      const b = parseInt(line[5], 10);
       chart[index].color = "#" + rgbToHex([r,g,b]);
+      chart[index].x = x == 1;
+      chart[index].i = i == 1;
     }
     return {
       type: 'chart',

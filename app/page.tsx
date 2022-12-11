@@ -83,7 +83,7 @@ const Page = () => {
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
-  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true, hidden: false}]);
+  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true, i: false, hidden: false}]);
   const [color, setColor] = useState<number>(0);
   const pickColor = useCallback((colorIndex: number) => setColor(colorIndex), []);
   const hideColor = useCallback((colorIndex: number) => setChart(c => c.map((value, i) => ({...value, hidden: colorIndex === i ? !value.hidden : value.hidden}))), []);
@@ -106,7 +106,7 @@ const Page = () => {
       drawPixel(pos, editingMod === "eraser" ? -1 : color, editingMod)
     }
   }, [drawPixel, editingMod, color]);
-  const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true,hidden:false}]), []);
+  const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true,i:false,hidden:false}]), []);
 
   const [pxSize, setPXSize] = useState<number>(15);
   const zoomIn = useCallback(() => setPXSize(v => v + 1), []);
@@ -176,10 +176,10 @@ const Page = () => {
         ANSIGrid[y][x] = grid[y][x] ?? 0;
       }
     }
-    let csv = "d0,d1"; // metadata
-    for (let i = 0; i < numColumns; i++) csv += ",a" + i;
+    let csv = "a0";
+    for (let i = 1; i < numColumns; i++) csv += ",a" + i;
     csv += "\n";
-    ANSIGrid.forEach((row) => csv += "0,0," + row.join(',') + "\n");
+    ANSIGrid.forEach((row) => csv += row.join(',') + "\n");
     downloadCSV(gridName!, csv);
   }, [grid, gridName]);
 
@@ -224,8 +224,9 @@ const Page = () => {
     const newChart: Chart = [];
     for (let element of chartItems) {
       const colorInput = element.querySelector("input[type='text']") as HTMLInputElement;
-      const xInput = element.querySelector("input[type='checkbox']") as HTMLInputElement;
-      newChart.push({color: colorInput.value, x: xInput.checked });
+      const xInput = element.querySelector("label.color-x input[type='checkbox']") as HTMLInputElement;
+      const iInput = element.querySelector("label.color-i input[type='checkbox']") as HTMLInputElement;
+      newChart.push({color: colorInput.value, x: xInput.checked, i: iInput.checked });
     }
     if (isLoggedIn(authState)) {
       setLoading(true);
@@ -244,10 +245,10 @@ const Page = () => {
 
   const downloadChart = useCallback(() => {
     saveChart();
-    const lines = ["index,x,r,g,b"];
+    const lines = ["index,x,i,r,g,b"];
     for (let i = 0; i < chart.length; i++) {
       lines.push(
-        i + "," + (chart[i].x ? '1' : '0') + "," + hexToRgb(chart[i].color).join(',')
+        i + ',' + (chart[i].x ? '1' : '0') + ',' + (chart[i].i ? '1' : '0') + ',' + hexToRgb(chart[i].color).join(',')
       );
     }
     downloadCSV("0-colors", lines.join('\n'));
