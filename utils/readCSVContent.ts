@@ -31,13 +31,11 @@ export default function readCSVContent(fileContent:string): CSVContent {
       const line = lines[y].split(',');
       const index = parseInt(line[0], 10);
       const x = parseInt(line[1], 10);
-      const i = parseInt(line[2], 10);
-      const r = parseInt(line[3], 10);
-      const g = parseInt(line[4], 10);
-      const b = parseInt(line[5], 10);
+      const r = parseInt(line[2], 10);
+      const g = parseInt(line[3], 10);
+      const b = parseInt(line[4], 10);
       chart[index].color = "#" + rgbToHex([r,g,b]);
       chart[index].x = x == 1;
-      chart[index].i = i == 1;
     }
     return {
       type: 'chart',

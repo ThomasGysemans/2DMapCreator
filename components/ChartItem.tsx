@@ -23,7 +23,6 @@ const ChartItem: React.FC<Props> = ({n, color, onPick, onHide}) => {
   const [selectedColor, setSelectedColor] = useState<string>(color.color);
   const [hidden, setHidden] = useState<boolean>(false);
   const [isX, setIsX] = useState<boolean>(color.x);
-  const [isI, setIsI] = useState<boolean>(color.i ?? false);
   const onColorPicked = useCallback(() => onPick(n), [n, onPick]);
   const hide = useCallback(() => { onHide(n); setHidden(c=>!c); }, [onHide, n]);
 
@@ -38,11 +37,6 @@ const ChartItem: React.FC<Props> = ({n, color, onPick, onHide}) => {
     setIsX(value);
   }, []);
 
-  const handleI = useCallback((input: ChangeEvent<HTMLInputElement>) => {
-    const value = input.target.checked;
-    setIsI(value);
-  }, []);
-
   return <div className="chart-item">
     <span>{n} - </span>
     <input className={!isValidColor ? 'unvalid-color' : ''} type="text" name={"name-" + n} value={selectedColor} onChange={handleSelectedColor} />
@@ -50,10 +44,6 @@ const ChartItem: React.FC<Props> = ({n, color, onPick, onHide}) => {
     <label className="color-x">
       <i>x</i>
       <input type="checkbox" name={"color-x-" + n} checked={isX} onChange={handleX} />
-    </label>
-    <label className="color-i">
-      <i>i</i>
-      <input type="checkbox" name={"color-i-" + n} checked={isI} onChange={handleI} />
     </label>
     <Button onClick={onColorPicked}><FontAwesomeIcon icon={faEyeDropperEmpty} /></Button>
     <button type="button" className="eye" onClick={hide}>

@@ -3,7 +3,7 @@ declare module 'sweetalert2/dist/sweetalert2';
 type Tab = "account" | "chart";
 type EditingMod = "default" | "square" | "circle" | "eraser" | "line" | "vertical-line" | "fill" | "pick";
 type Grid = number[][];
-type ChartItemDesc = { color: string; x: boolean, hidden?: boolean, i?: boolean };
+type ChartItemDesc = { color: string; x: boolean, hidden?: boolean };
 type Chart = ChartItemDesc[];
 
 interface Pos {
