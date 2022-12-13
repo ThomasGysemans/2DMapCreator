@@ -155,7 +155,7 @@ const Page = () => {
             setAllProjects(projects);
           }
           setChart(data.chart);
-          setTeleportations(data.teleportations);
+          setTeleportations(data.teleportations ?? []);
         }
       }
     })();
