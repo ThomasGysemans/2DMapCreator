@@ -1,7 +1,5 @@
-declare module 'sweetalert2/dist/sweetalert2';
-
-type Tab = "account" | "chart";
-type EditingMod = "default" | "square" | "circle" | "eraser" | "line" | "vertical-line" | "fill" | "pick";
+type Tab = "account" | "chart" | "teleportation";
+type EditingMod = "default" | "square" | "circle" | "eraser" | "line" | "vertical-line" | "fill" | "pick" | "selecting-pos";
 type Grid = number[][];
 type ChartItemDesc = { color: string; x: boolean, hidden?: boolean };
 type Chart = ChartItemDesc[];
@@ -9,6 +7,15 @@ type Chart = ChartItemDesc[];
 interface Pos {
   x: number;
   y: number;
+}
+
+interface Teleportation {
+  color: number;
+  map: string;
+  movX: number;
+  movY: number;
+  targetY: number;
+  targetX: number;
 }
 
 interface AuthContextValue {
@@ -26,6 +33,7 @@ interface UserData {
   projects:ProjectData[];
   registrationDate:number;
   chart: Chart;
+  teleportations: Teleportation[];
 }
 
 interface ProjectData {

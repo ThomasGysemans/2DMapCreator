@@ -111,8 +111,8 @@
 *
 */
 
-.container-chart,
-.container-chart > form {
+.left-sidebar,
+.left-sidebar > form {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,7 +126,8 @@
   margin-bottom: 50px;
 }
 
-.chart-item span {
+.chart-item span,
+.teleportation-item span {
   display: block;
   width: 30px;
   min-width: 30px;
@@ -196,9 +197,97 @@
   cursor: pointer;
 }
 
-.container-chart button[type="submit"] {
+.left-sidebar button[type="submit"] {
   margin: 25px 0;
   font-size: 0.85em;
+}
+
+/*
+*
+* teleportations tab
+*
+*/
+
+.container-teleportations form {
+  width: 100%;
+}
+
+.teleportation-item {
+  width: 100%;
+  margin-bottom: 20px;
+
+  div {
+    display: flex;
+    align-items: center;
+
+    button {
+      margin: 0 10px;
+    }
+  }
+}
+
+.teleportation-item input[name="color-index"] {
+  width: 90px;
+}
+
+.teleportation-item select[name="map"] {
+  width: 100%;
+}
+
+.teleportation-item input[name="targetX"],
+.teleportation-item input[name="targetY"] {
+  width: 80px;
+}
+
+.container-teleportations table {
+  width: 100%;
+}
+
+.container-teleportations tr {
+  margin-bottom: 20px;
+}
+
+.container-teleportations th,
+.container-teleportations td {
+  padding-top: 20px;
+}
+
+.container-teleportations td input {
+  margin-right: 10px;
+}
+
+.container-teleportations th {
+  font-weight: normal;
+  color: $text-color;
+  font-size: 0.9em;
+  padding-left: 25px;
+}
+
+.container-teleportations th button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: $text-color;
+  padding: 0;
+  opacity: 0.8;
+  transition: opacity 200ms ease;
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+}
+
+.teleportation-item button {
+  width: 25px;
+  min-width: 25px;
+  height: 25px;
+  padding: 0;
+  background-color: $primary-color;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 /*
@@ -360,9 +449,21 @@ main > form label {
 */
 
 .grid-container {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 100px;
   grid-template-rows: auto auto;
+}
+
+.selected-pos {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  color: $text-color;
+  opacity: 0.6;
+  font-weight: lighter;
+  font-size: 0.85em;
+  margin: 0;
 }
 
 .grid-sidebar {
@@ -399,7 +500,7 @@ main > form label {
 }
 
 .grid-dimensions-settings {
-  margin-top: 10px;
+  margin-top: 25px;
   width: 100%;
   height: 100%;
   display: flex;

@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faDownLong, faEraser, faEyeDropper, faEyeDropperEmpty, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsToDot, faCircleUser, faDiamond, faDownload, faDownLong, faEraser, faEyeDropper, faEyeDropperEmpty, faFileImport, faFill, faMagnifyingGlassMinus, faMagnifyingGlassPlus, faMapLocation, faPenFancy, faRightLong, faSave, faSquare, faSwatchbook } from "@fortawesome/free-solid-svg-icons";
 import { useCallback, useState, useRef } from "react";
 import { Grid } from "../components/Grid";
 import { useAuth } from "../fireconfig/auth";
@@ -25,10 +25,11 @@ import compileGridData from "../utils/compileGridData";
 import initGrid from "../utils/initGrid";
 import deepCopyOf from "../utils/deepCopyOf";
 import saveProject from "../utils/saveProject";
-import { faImage } from "@fortawesome/free-regular-svg-icons";
+import { faHandPointer, faImage } from "@fortawesome/free-regular-svg-icons";
 import downloadPNG from "../utils/downloadPNG";
 import createPNG from "../utils/createPNG";
 import LoadingAnimation from "../components/LoadingAnimation";
+import TeleportationItem from "../components/TeleportationItem";
 
 const validateDimensions = (width:number, height:number) => {
   const max = 150;
@@ -48,6 +49,7 @@ const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const createGridForm = useRef<HTMLFormElement>(null);
   const chartForm = useRef<HTMLFormElement>(null);
+  const teleportationsForm = useRef<HTMLFormElement>(null);
   const dimensionsForm = useRef<HTMLFormElement>(null);
   const importCSVInput = useRef<HTMLInputElement>(null);
   const accountForm = useRef<HTMLFormElement>(null);
@@ -76,6 +78,15 @@ const Page = () => {
     setSelectedTab("chart");
     setIsLeftSidebarOpen(true);
   }, [selectedTab, isLeftSidebarOpen]);
+  const selectTeleportationTab = useCallback(() => {
+    if (isLeftSidebarOpen) {
+      if (selectedTab === "teleportation") {
+        return setIsLeftSidebarOpen(false);
+      }
+    }
+    setSelectedTab("teleportation");
+    setIsLeftSidebarOpen(true);
+  }, [isLeftSidebarOpen, selectedTab]);
 
   // TODO: Undo/redo system
   // it won't work as expected because grid is also getting modified when index is in the past
@@ -83,8 +94,10 @@ const Page = () => {
   //const [registerState, { undo, redo }] = useRegistry(grid, setGrid);
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
+  const [teleportations, setTeleportations] = useState<Teleportation[]>([]);
   const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true, hidden: false}]);
   const [color, setColor] = useState<number>(0);
+  const [selectedPos, setSelectedPos] = useState<Pos|null>(null);
   const pickColor = useCallback((colorIndex: number) => setColor(colorIndex), []);
   const hideColor = useCallback((colorIndex: number) => setChart(c => c.map((value, i) => ({...value, hidden: colorIndex === i ? !value.hidden : value.hidden}))), []);
   const onPixelClicked = useCallback((pos: Pos, e:MouseEvent) => {
@@ -102,11 +115,26 @@ const Page = () => {
         setColor(n);
         setEditingMod("default");
       }
+    } else if (editingMod === "selecting-pos") {
+      const cell = (e.target as HTMLDivElement);
+      if (cell) {
+        const x = cell.dataset.posx;
+        const y = cell.dataset.posy;
+        if (x && y) {
+          const pos = {
+            x: parseInt(x, 10),
+            y: parseInt(y, 10),
+          };
+          setSelectedPos(pos);
+          setEditingMod("default");
+        }
+      }
     } else {
       drawPixel(pos, editingMod === "eraser" ? -1 : color, editingMod)
     }
   }, [drawPixel, editingMod, color]);
   const addNewColorToChart = useCallback(() => setChart(v => [...v, {color:"#ffffff",x:true,i:false,hidden:false}]), []);
+  const addNewTeleportation = useCallback(() => setTeleportations(v => [...v, {map:"",targetX:0,targetY:0,movX:0,movY:0,color:0}]), []);
 
   const [pxSize, setPXSize] = useState<number>(15);
   const zoomIn = useCallback(() => setPXSize(v => v + 1), []);
@@ -127,6 +155,7 @@ const Page = () => {
             setAllProjects(projects);
           }
           setChart(data.chart);
+          setTeleportations(data.teleportations);
         }
       }
     })();
@@ -157,10 +186,10 @@ const Page = () => {
           throw new Error("Expected plain text as content for imported file.");
         }
         const result = readCSVContent(content);
-        if (result.type === "map") {
-          setGrid(result.result as Grid);
-        } else {
-          setChart(result.result as Chart);
+        switch (result.type) {
+          case "map": setGrid(result.result as Grid); break;
+          case "chart": setChart(result.result as Chart); break;
+          case "teleportations": setTeleportations(result.result as Teleportation[]); break;
         }
       });
       reader.readAsText(uploadedFile);
@@ -183,7 +212,12 @@ const Page = () => {
     downloadCSV(gridName!, csv);
   }, [grid, gridName]);
 
-  const exportToPNG = useCallback(() => downloadPNG(createPNG(grid, chart), gridName!), [grid, chart, gridName]);
+  const exportToPNG = useCallback(() => {
+    if ((gridName === null && selectedProjectIndex === -1) || askingToCreateANewGrid) {
+      return;
+    }
+    downloadPNG(createPNG(grid, chart), gridName!)
+  }, [gridName, selectedProjectIndex, askingToCreateANewGrid, grid, chart]);
 
   const initApp = useCallback((e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -239,19 +273,64 @@ const Page = () => {
         setLoading(false);
       }
     }
-    setChart(c => newChart.map((value, index) => ({...value, hidden: c[index].hidden})));
+    setChart(c => newChart.map((value, index) => ({ ...value, hidden: c[index].hidden })));
   }, [authState]);
 
-  const downloadChart = useCallback(() => {
-    saveChart();
-    const lines = ["index,x,r,g,b"];
-    for (let i = 0; i < chart.length; i++) {
+  const saveTeleportations = useCallback(async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    const data = new FormData(teleportationsForm.current!);
+    const entries = Array.from(data.entries());
+    const newTeleportations: Teleportation[] = [];
+    for (let i = 0; i < entries.length; i+=6) {
+      newTeleportations.push({
+        color: parseInt(entries[i][1] as string),
+        map: entries[i + 1][1] as string,
+        movX: parseInt(entries[i + 2][1] as string),
+        movY: parseInt(entries[i + 3][1] as string),
+        targetX: parseInt(entries[i + 4][1] as string),
+        targetY: parseInt(entries[i + 5][1] as string),
+      });
+    }
+    if (isLoggedIn(authState)) {
+      setLoading(true);
+      try {
+        const user = authState.user!;
+        const docRef = doc(firestore, "users", user.uid);
+        await updateDoc(docRef, { teleportations: newTeleportations });
+      } catch (e) {
+        console.warn("Cannot save the teleportations due to error '" + (e as any).code + "'. Skipping.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    setTeleportations(newTeleportations);
+    return newTeleportations;
+  }, [authState]);
+
+  const downloadChart = useCallback(async () => {
+    await saveChart();
+    setChart(c => {
+      const lines = ["index,x,r,g,b"];
+      for (let i = 0; i < c.length; i++) {
+        lines.push(
+          i + ',' + (c[i].x ? '1' : '0') + ',' + hexToRgb(c[i].color).join(',')
+        );
+      }
+      downloadCSV("0-colors", lines.join('\n'));
+      return c;
+    });
+  }, [saveChart]);
+
+  const downloadTeleportations = useCallback(async () => {
+    const saved = await saveTeleportations();
+    const lines = ["color,map,movX,movY,x,y"];
+    for (let i = 0; i < saved.length; i++) {
       lines.push(
-        i + ',' + (chart[i].x ? '1' : '0') + ',' + hexToRgb(chart[i].color).join(',')
+        saved[i].color + ',' + saved[i].map + ',' + saved[i].movX + ',' + saved[i].movY + ',' + saved[i].targetX + ',' + saved[i].targetY
       );
     }
-    downloadCSV("0-colors", lines.join('\n'));
-  }, [saveChart, chart]);
+    downloadCSV("0-teleportations", lines.join('\n'));
+  }, [saveTeleportations]);
 
   const onDimensionsChanged = useCallback((e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -352,11 +431,17 @@ const Page = () => {
     setAskingToCreateANewGrid(true);
   }, []);
 
+  const removeTeleportation = useCallback((index:number) => {
+    setTeleportations(c => {
+      c.splice(index,1);
+      return deepCopyOf(c);
+    });
+  }, []);
+
   // TODO: the buttons inside the chart container are still focusable even though the container is hidden
 
   return <div className="page">
     <aside className="toolsbar">
-
       <button title="Votre compte" onClick={selectAccountTab}>
         <FontAwesomeIcon icon={faCircleUser} />
       </button>
@@ -366,6 +451,9 @@ const Page = () => {
       </button>
       <button title="Ouvrir la charte de couleurs" onClick={selectChartTab}>
         <FontAwesomeIcon icon={faSwatchbook} />
+      </button>
+      <button title="Ouvrir les passerelles" onClick={selectTeleportationTab}>
+        <FontAwesomeIcon icon={faMapLocation} />
       </button>
       <button title="Exporter au format CSV" onClick={exportToCSV}>
         <FontAwesomeIcon icon={faDownload} />
@@ -391,23 +479,44 @@ const Page = () => {
           </form>
         }
       </aside>
-      : <aside className={"left-sidebar container-chart" + (isLeftSidebarOpen ? " open" : "")}>
-        <h2>Votre charte de couleurs</h2>
-        <form ref={chartForm} onSubmit={saveChart}>
-          {chart.map((color, i) =>
-            <ChartItem
-              key={i + "-" + color}
-              n={i}
-              color={color}
-              onPick={pickColor}
-              onHide={hideColor}
-            />
-          )}
-          <Button secondary onClick={addNewColorToChart}>Ajouter une couleur</Button>
-          <Button type="submit" loading={loading}>Enregistrer les modifications</Button>
-          <Button onClick={downloadChart}>Télécharger la charte</Button>
-        </form>
-      </aside>
+      : (selectedTab === "teleportation"
+        ? <aside className={"left-sidebar container-teleportations" + (isLeftSidebarOpen ? " open" : "")}>
+          <h2>Les passerelles entre les maps</h2>
+          <p>Défini les cases qui peuvent servir de passerelle vers une autre carte. Défini le mouvement nécessaire pour y accéder et à quelle position le joueur apparaît sur la nouvelle carte.</p>
+          <form ref={teleportationsForm} onSubmit={saveTeleportations}>
+            {teleportations.map((teleportation, i) => 
+              <TeleportationItem
+                key={i + "-" + teleportation}
+                index={i}
+                teleportation={teleportation}
+                maps={allProjects.map(v => v.name)}
+                currentColorIndex={color}
+                onTeleportationRemoved={removeTeleportation}
+              />
+            )}
+            <Button secondary onClick={addNewTeleportation}>Ajouter une passerelle</Button>
+            <Button type="submit" loading={loading}>Enregistrer les modifications</Button>
+            <Button onClick={downloadTeleportations}>Télécharger le CSV</Button>
+          </form>
+        </aside>
+        : <aside className={"left-sidebar container-chart" + (isLeftSidebarOpen ? " open" : "")}>
+          <h2>Votre charte de couleurs</h2>
+          <form ref={chartForm} onSubmit={saveChart}>
+            {chart.map((color, i) =>
+              <ChartItem
+                key={i + "-" + color}
+                n={i}
+                color={color}
+                onPick={pickColor}
+                onHide={hideColor}
+              />
+            )}
+            <Button secondary onClick={addNewColorToChart}>Ajouter une couleur</Button>
+            <Button type="submit" loading={loading}>Enregistrer les modifications</Button>
+            <Button onClick={downloadChart}>Télécharger la charte</Button>
+          </form>
+        </aside>
+      )
     }
     <main>
       {(gridName === null && selectedProjectIndex === -1) || askingToCreateANewGrid
@@ -430,15 +539,22 @@ const Page = () => {
             <EditingTool icon={faRightLong} mode="line" enabled={editingMod === "line"} onClick={changeEditingTool} />
             <EditingTool icon={faDownLong} mode="vertical-line" enabled={editingMod === "vertical-line"} onClick={changeEditingTool} />
             <EditingTool icon={faFill} mode="fill" enabled={editingMod === "fill"} onClick={changeEditingTool} />
+            <EditingTool icon={faHandPointer} mode="selecting-pos" enabled={editingMod === "selecting-pos"} onClick={changeEditingTool} />
             <EditingTool icon={faEyeDropperEmpty} mode="pick" enabled={editingMod === "pick"} onClick={changeEditingTool} />
             <button onClick={zoomIn}><FontAwesomeIcon icon={faMagnifyingGlassPlus} /></button>
-            <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
             <button onClick={save} disabled={loading}>
               {loading
                 ? <LoadingAnimation opposite />
                 : <FontAwesomeIcon icon={faSave} />
               }
             </button>
+            <button onClick={zoomOut}><FontAwesomeIcon icon={faMagnifyingGlassMinus} /></button>
+            <p className="selected-pos">
+              {selectedPos != null
+                ? `you selected (${selectedPos.x};${selectedPos.y})`
+                : null
+              }
+            </p>
           </div>
           <form ref={dimensionsForm} onSubmit={onDimensionsChanged} className="grid-dimensions-settings">
             <Input label="Largeur" type="number" name="width" />

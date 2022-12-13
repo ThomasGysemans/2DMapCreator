@@ -1,8 +1,8 @@
 import rgbToHex from "./rgbToHex";
 
 interface CSVContent {
-  type: 'map' | 'chart';
-  result: Grid | Chart;
+  type: "map" | "chart" | "teleportations";
+  result: Grid | Chart | Teleportation[];
 }
 
 /**
@@ -40,6 +40,23 @@ export default function readCSVContent(fileContent:string): CSVContent {
     return {
       type: 'chart',
       result: chart,
+    }
+  } else if (lines[0].startsWith("color")) {
+    const teleportations: Teleportation[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].split(',');
+      teleportations[i-1] = {
+        color: parseInt(line[0], 10),
+        map: line[1],
+        movX: parseInt(line[2], 10),
+        movY: parseInt(line[3], 10),
+        targetX: parseInt(line[4], 10),
+        targetY: parseInt(line[4], 10),
+      };
+    }
+    return {
+      type: 'teleportations',
+      result: teleportations,
     }
   } else {
     throw new Error("Invalid format for given file.");

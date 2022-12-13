@@ -6,7 +6,8 @@ label {
   font-size: 0.9em;
 }
 
-input {
+input,
+select {
   font-family: $font-family;
   background-color: $input-background-color;
   color: $text-color;
