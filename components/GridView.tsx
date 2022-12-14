@@ -30,7 +30,7 @@ const GridViewComponent: React.FC<GridViewProps> = ({uid,grid,chart}) => {
         {line.map((cell, x) =>
           <Pixel
             key={"pixel-" + y + "-" + x}
-            color={cell == -1 ? null : chart[cell].color}
+            color={cell == -1 ? null : (chart[cell]?.color ?? null)}
             x={x}
             y={y}
           />

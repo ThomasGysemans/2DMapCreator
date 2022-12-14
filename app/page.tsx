@@ -95,7 +95,7 @@ const Page = () => {
 
   const [grid, setGrid, drawPixel, setDimensions] = useGrid(25, 25, -1);
   const [teleportations, setTeleportations] = useState<Teleportation[]>([]);
-  const [chart, setChart] = useState<Chart>([{color: "#ffffff", x: true, hidden: false}]);
+  const [chart, setChart] = useState<Chart>([]);
   const [color, setColor] = useState<number>(0);
   const [selectedPos, setSelectedPos] = useState<Pos|null>(null);
   const pickColor = useCallback((colorIndex: number) => setColor(colorIndex), []);
