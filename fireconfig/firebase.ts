@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBkX_tS8c7DyImhq91-h8XzcM1rtnFNQBA",
-  authDomain: "dmapcreator.firebaseapp.com",
-  projectId: "dmapcreator",
-  storageBucket: "dmapcreator.appspot.com",
-  messagingSenderId: "131939280958",
-  appId: "1:131939280958:web:1d61d2de3e5e234de8896f"
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
