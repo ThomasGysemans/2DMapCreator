@@ -307,13 +307,14 @@ const Page = () => {
     return newTeleportations;
   }, [authState]);
 
+  // TODO: for the new game, i removed the "index" column (necessary for "Microsoft World Conquest" though)
   const downloadChart = useCallback(async () => {
     await saveChart();
     setChart(c => {
-      const lines = ["index,x,r,g,b"];
+      const lines = ["x,r,g,b"];
       for (let i = 0; i < c.length; i++) {
         lines.push(
-          i + ',' + (c[i].x ? '1' : '0') + ',' + hexToRgb(c[i].color).join(',')
+          (c[i].x ? '1' : '0') + ',' + hexToRgb(c[i].color).join(',')
         );
       }
       downloadCSV("0-colors", lines.join('\n'));
