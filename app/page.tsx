@@ -2,7 +2,7 @@
 
 import "../styles/index.scss";
 
-import { ChangeEvent, FormEvent, useEffect } from "react";
+import { ChangeEvent, FormEvent, useEffect, useReducer } from "react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import ProjectsBar from "../components/ProjectsBar";
@@ -188,13 +188,13 @@ const Page = () => {
         const result = readCSVContent(content);
         switch (result.type) {
           case "map": setGrid(result.result as Grid); break;
-          case "chart": setChart(result.result as Chart); break;
+          case "chart": setChart(result.result as Chart); selectAccountTab(); break; // I hate React
           case "teleportations": setTeleportations(result.result as Teleportation[]); break;
         }
       });
       reader.readAsText(uploadedFile);
     }
-  }, [setGrid]);
+  }, [setGrid, setChart, setTeleportations, selectAccountTab]);
 
   const exportToCSV = useCallback(() => {
     const ANSIGrid: number[][] = [];

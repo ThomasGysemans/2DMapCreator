@@ -25,17 +25,20 @@ export default function readCSVContent(fileContent:string): CSVContent {
       type:'map',
       result: grid,
     }
-  } else if (lines[0].startsWith("index")) {
+  } else if (lines[0].startsWith("x")) {
     const chart: Chart = [];
     for (let y = 1; y < lines.length; y++) {
       const line = lines[y].split(',');
-      const index = parseInt(line[0], 10);
-      const x = parseInt(line[1], 10);
-      const r = parseInt(line[2], 10);
-      const g = parseInt(line[3], 10);
-      const b = parseInt(line[4], 10);
-      chart[index].color = "#" + rgbToHex([r,g,b]);
-      chart[index].x = x == 1;
+      const x = parseInt(line[0]);
+      const r = parseInt(line[1]);
+      const g = parseInt(line[2]);
+      const b = parseInt(line[3]);
+      chart.push(
+        {
+          color: "#" + rgbToHex([r,g,b]),
+          x: x == 1
+        }
+      );
     }
     return {
       type: 'chart',
